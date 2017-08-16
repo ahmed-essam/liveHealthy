@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#00A599</color>
+    <color name="colorPrimaryDark">#00998D</color>
+    <color name="colorAccent">#F1F1F1</color>
+    <color name="textColor">#CBC8C8</color>
+    <color name="textColorDark">#595958</color>
+    <color name="doctorsBackGround">#F5F3F3</color>
+
+
+</resources>
