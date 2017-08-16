@@ -3,14 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-
-
-    <View
-        android:layout_gravity="center"
-        android:background="@android:color/black"
-        android:layout_width="48dp"
-        android:layout_height="48dp" />
-
+    
     <ProgressBar
         android:id="@+id/fragment_progress_bar"
         android:layout_width="match_parent"
