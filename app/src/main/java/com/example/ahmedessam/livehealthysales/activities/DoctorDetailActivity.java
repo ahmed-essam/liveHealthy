@@ -2,13 +2,11 @@ package com.example.ahmedessam.livehealthysales.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -20,18 +18,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.ahmedessam.livehealthysales.R;
 import com.example.ahmedessam.livehealthysales.adapters.DemoCollectionPagerAdapter;
-import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.AllDoctorsResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.DoctorDetailResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.clinic.ClinicGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.delete.DeleteDoctorGeneralResponse;
-import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.speciality.SpecialityGeneralResponse;
 import com.example.ahmedessam.livehealthysales.models.Clinic;
 import com.example.ahmedessam.livehealthysales.models.DoctorDetail;
 import com.example.ahmedessam.livehealthysales.network.NetworkProvider;
 import com.example.ahmedessam.livehealthysales.util.UserHelper;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,6 +39,7 @@ import retrofit2.Response;
 
 public class DoctorDetailActivity extends AppCompatActivity {
 
+    public static final String DoctorArg = "doctor_id";
     @BindView(R.id.detail_toolbar)
     Toolbar detailToolbar;
     @BindView(R.id.detail_doctor_image)
@@ -73,24 +68,26 @@ public class DoctorDetailActivity extends AppCompatActivity {
     ViewPager viewpager;
     @BindView(R.id.Linear_Layout)
     LinearLayout linear_layout;
-
-
-
     Call<DoctorDetailResponse> responceCall;
     Call<ClinicGeneralResponse> clinicResponceCall;
     Call<DeleteDoctorGeneralResponse> deleteDoctorResponseCall;
     DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
     List<Clinic> clinics;
-    private int datesState;
     DoctorDetail doctorDetail;
-    public static final String DoctorArg = "doctor_id";
+    private int datesState;
     private int doctorId;
+
+    public static Intent newDoctorDetail(Context context, int doctor) {
+        Intent intent = new Intent(context, DoctorDetailActivity.class);
+        intent.putExtra(DoctorArg, doctor);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_detail);
-        datesState =0;
+        datesState = 0;
         ButterKnife.bind(this);
         setSupportActionBar(detailToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -107,34 +104,25 @@ public class DoctorDetailActivity extends AppCompatActivity {
 
     }
 
-
-
     @OnClick(R.id.edit_button)
-    public void setEditButton(){
+    public void setEditButton() {
         if (doctorDetail != null) {
-          Intent intent =  AddDoctorActivity.newAddDoctorIntent(this,doctorDetail );
+            Intent intent = AddDoctorActivity.newAddDoctorIntent(this, doctorDetail);
             startActivity(intent);
         }
     }
 
-
-    public void showDates(){
-        if (datesState ==0){
+    public void showDates() {
+        if (datesState == 0) {
             datesState = 1;
             linear_layout.setVisibility(View.VISIBLE);
             datesIcons.setImageResource(R.drawable.ic_action_minus);
             fetchClinics();
-        }else{
+        } else {
             datesState = 0;
             linear_layout.setVisibility(View.GONE);
             datesIcons.setImageResource(R.drawable.ic_action_add);
         }
-    }
-
-    public static Intent newDoctorDetail(Context context, int doctor) {
-        Intent intent = new Intent(context, DoctorDetailActivity.class);
-        intent.putExtra(DoctorArg, doctor);
-        return intent;
     }
 
     public int getDoctorId() {
@@ -143,15 +131,15 @@ public class DoctorDetailActivity extends AppCompatActivity {
     }
 
     public void addView(DoctorDetail response) {
-        if (Locale.getDefault().getDisplayLanguage().equals("العربيه") && response.getNameAR()!= null){
+        if (Locale.getDefault().getDisplayLanguage().equals("العربيه") && response.getNameAR() != null) {
             doctorName.setText(response.getNameAR());
 
         } else {
             doctorName.setText(response.getName());
         }
-        if (UserHelper.getAppLang(this).equals("ar") && response.getDescriptionAR()!= null){
+        if ("ar".equals(UserHelper.getAppLang(this)) && response.getDescriptionAR() != null) {
             id.setText(response.getDescriptionAR());
-        }else{
+        } else {
             id.setText(response.getDescription());
         }
         if (response.getEmail() != null) {
@@ -162,10 +150,10 @@ public class DoctorDetailActivity extends AppCompatActivity {
         phone.setText(response.getMobileNumber());
         location.setText(response.getLocation());
 
-            Glide.with(this).load(response.getImage())
-                    .placeholder(R.drawable.doctor_icon)
-                    .error(R.drawable.doctor_icon)
-                    .into(doctorImageView);
+        Glide.with(this).load(response.getImage())
+                .placeholder(R.drawable.doctor_icon)
+                .error(R.drawable.doctor_icon)
+                .into(doctorImageView);
 //        fetchClinics();
     }
 
@@ -233,7 +221,7 @@ public class DoctorDetailActivity extends AppCompatActivity {
             public void onResponse(Call<ClinicGeneralResponse> call, Response<ClinicGeneralResponse> response) {
                 if (verifyClinicResponse(response)) {
                     clinics = response.body().getResponse().getClinics();
-                    if (clinics.size() != 0){
+                    if (clinics.size() != 0) {
                         noClinic.setVisibility(View.GONE);
                         tabLayout.setVisibility(View.VISIBLE);
                         mDemoCollectionPagerAdapter =
@@ -241,7 +229,7 @@ public class DoctorDetailActivity extends AppCompatActivity {
                                         getSupportFragmentManager(), clinics, doctorId);
                         viewpager.setAdapter(mDemoCollectionPagerAdapter);
                         tabLayout.setupWithViewPager(viewpager);
-                    }else{
+                    } else {
                         noClinic.setVisibility(View.VISIBLE);
                         tabLayout.setVisibility(View.GONE);
                     }
@@ -256,7 +244,7 @@ public class DoctorDetailActivity extends AppCompatActivity {
         });
     }
 
-    public void deleteDoctor(){
+    public void deleteDoctor() {
         deleteDoctorResponseCall = NetworkProvider.provideNetworkMethods(this).deleteDoctor(doctorId);
         deleteDoctorResponseCall.enqueue(new Callback<DeleteDoctorGeneralResponse>() {
             @Override
@@ -265,7 +253,7 @@ public class DoctorDetailActivity extends AppCompatActivity {
                     if (response.body().isSuccess()) {
                         if (response.body() != null) {
                             Toast.makeText(DoctorDetailActivity.this, R.string.doctor_deleted, Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(DoctorDetailActivity.this,DoctorsActivity.class));
+                            startActivity(new Intent(DoctorDetailActivity.this, DoctorsActivity.class));
                         } else {
                             Toast.makeText(DoctorDetailActivity.this, R.string.no_data, Toast.LENGTH_SHORT).show();
 
