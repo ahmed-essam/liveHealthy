@@ -15,7 +15,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -89,8 +88,8 @@ public class AddDoctorActivity extends BaseLocationActivity {
     EditText emailEditText;
     @BindView(R.id.social_media)
     EditText socialMedia;
-    @BindView(R.id.edit_clinics)
-    Button editClinicButton;
+//    @BindView(R.id.edit_clinics)
+//    Button editClinicButton;
     @BindView(R.id.progress_bar)
     ProgressBar progress;
     @BindView(R.id.nested_scroll)
@@ -144,8 +143,8 @@ public class AddDoctorActivity extends BaseLocationActivity {
             newDoctor = false;
             specialtyID = doctorDetail.getSpecialityID();
         } else {
-            editClinicButton.setEnabled(false);
-            editClinicButton.setVisibility(View.GONE);
+//            editClinicButton.setEnabled(false);
+//            editClinicButton.setVisibility(View.GONE);
         }
 
     }
@@ -240,11 +239,11 @@ public class AddDoctorActivity extends BaseLocationActivity {
         }
     }
 
-    @OnClick(R.id.edit_clinics)
-    public void EditClinic() {
-        Intent intent = ClinicsActivity.newClinics(this, doctorDetail.getDoctorID());
-        startActivity(intent);
-    }
+//    @OnClick(R.id.edit_clinics)
+//    public void EditClinic() {
+//        Intent intent = ClinicsActivity.newClinics(this, doctorDetail.getDoctorID());
+//        startActivity(intent);
+//    }
 
 
     @Override
