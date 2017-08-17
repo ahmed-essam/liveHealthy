@@ -165,11 +165,12 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
 
         adapter = new ScheduleAdapter(new ArrayList<Day>(), this);
         adapter.setHideDelete(false);
-        fetchSchedule();
+
         scheduleRecycler.setAdapter(adapter);
         scheduleRecycler.setLayoutManager(new LinearLayoutManager(this));
         scheduleRecycler.setNestedScrollingEnabled(false);
         if (!isCreate) {
+            fetchSchedule();
             showDate();
         }else{
             fetchCities();
@@ -505,6 +506,12 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
             public void onResponse(Call<UpdateDoctorResponse> call, Response<UpdateDoctorResponse> response) {
                 if (verifyUpdateClinicResponse(response)) {
                     progressBar.setVisibility(View.GONE);
+                    if (isCreate){
+                        Toast.makeText(EditClinicActivity.this, R.string.clinic_added, Toast.LENGTH_SHORT).show();
+                    }else
+                    {
+                        Toast.makeText(EditClinicActivity.this, R.string.clinic_updated, Toast.LENGTH_SHORT).show();
+                    }
                     isCreate = false;
                 } else {
                     progressBar.setVisibility(View.GONE);

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.ahmedessam.livehealthysales.activities.AddDoctorActivity"
+    android:orientation="vertical"
+    android:background="@drawable/new_doctor_bg">
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:id="@+id/add_doctor_toolbar"
+        android:elevation="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/edit_doctor"
+            android:textSize="20sp"
+            android:textColor="@color/colorAccent"
+            android:layout_gravity="center"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/checked"
+            android:id="@+id/save_icon"
+            />
+
+
+    </android.support.v7.widget.Toolbar>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/nested_scroll"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:orientation="vertical"
+            >
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progress="0"
+                android:progressBackgroundTint="@color/colorPrimary"
+                app:backgroundTint="@color/colorPrimary"
+                android:id="@+id/progress_bar"
+                android:padding="4dp"
+                android:visibility="gone"
+                />
+
+            <EditText
+                android:id="@+id/doctor_name_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/white_edit_text"
+                android:elevation="2dp"
+                android:hint="@string/doctor_name"
+                android:minHeight="40dp"
+                android:padding="4dp"
+                android:inputType="text"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:nextFocusForward="@+id/doctor_name_ar_edit"
+                />
+
+            <EditText
+                android:id="@+id/doctor_name_ar_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/white_edit_text"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:hint="@string/name_in_arabic"
+                android:layout_marginTop="10dp"
+                android:padding="4dp"
+                android:minHeight="40dp"
+                android:elevation="2dp"
+                android:inputType="text"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:nextFocusForward="@+id/speciality_spinner"
+                />
+            <EditText
+                android:id="@+id/speciality_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/white_edit_text"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:padding="4dp"
+                android:hint="@string/speciality_edit"
+                android:paddingStart="4dp"
+                android:minHeight="40dp"
+                android:elevation="2dp"
+                android:paddingLeft="4dp"
+                android:gravity="start"
+                android:drawableEnd="@drawable/down_arrow_copy"
+                android:drawablePadding="5dp"
+                android:drawableRight="@drawable/down_arrow_copy"
+                android:editable="false"
+                android:maxLines="1"
+                android:nextFocusForward="@+id/gender"
+                />
+
+
+            <EditText
+                android:id="@+id/email_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/white_edit_text"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:hint="@string/email"
+                android:layout_marginTop="10dp"
+                android:padding="4dp"
+                android:minHeight="40dp"
+                android:elevation="4dp"
+                android:drawablePadding="4dp"
+                android:inputType="textEmailAddress"
+                android:selectAllOnFocus="true"
+                android:nextFocusForward="@+id/consultant"
+                android:maxLines="1"
+                />
+
+
+            <EditText
+
+                android:id="@+id/phone_number_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/white_edit_text"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:hint="@string/phone_number"
+                android:layout_marginTop="10dp"
+                android:padding="4dp"
+                android:minHeight="40dp"
+                android:elevation="4dp"
+                android:inputType="phone"
+                android:selectAllOnFocus="true"
+                android:nextFocusForward="@+id/social_media"
+                />
+
+            <EditText
+
+                android:id="@+id/english_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/white_edit_text"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:hint="@string/description_in_english"
+                android:layout_marginTop="10dp"
+                android:padding="4dp"
+                android:minHeight="40dp"
+                android:elevation="4dp"
+                android:inputType="text"
+                android:selectAllOnFocus="true"
+                android:nextFocusForward="@+id/arabic_description"
+                />
+            <EditText
+
+                android:id="@+id/arabic_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/white_edit_text"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:hint="@string/description_in_arabic"
+                android:layout_marginTop="10dp"
+                android:padding="4dp"
+                android:minHeight="40dp"
+                android:elevation="4dp"
+                android:inputType="text"
+                android:selectAllOnFocus="true"
+                android:nextFocusForward="@+id/tittle"
+                />
+
+            <Button
+                android:id="@+id/edit_clinics"
+                style="@style/Base.Widget.AppCompat.Button.Borderless"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@color/colorPrimary"
+                android:text="@string/edit_clinic"
+                android:textAllCaps="false"
+                android:textColor="@color/colorAccent" />
+
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+
+</LinearLayout>
+
+

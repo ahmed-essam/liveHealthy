@@ -116,10 +116,10 @@ public class DoctorDetailActivity extends AppCompatActivity {
     @OnClick(R.id.edit_button)
     public void setEditButton() {
         if (Connectivity.isConnected(this)){
-            startActivity(new Intent(this, AddDoctorActivity.class));
+            startActivity(new Intent(this, EditDoctorActivity.class));
         }
-        if (doctorDetail != null) {
-            Intent intent = AddDoctorActivity.newAddDoctorIntent(this, doctorDetail);
+        if(doctorDetail != null){
+            Intent intent = EditDoctorActivity.newEditDoctorIntent(this,doctorDetail);
             startActivity(intent);
         }
     }

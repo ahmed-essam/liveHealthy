@@ -95,8 +95,6 @@ public class AddDoctorActivity extends BaseLocationActivity {
     EditText emailEditText;
     @BindView(R.id.social_media)
     EditText socialMedia;
-    @BindView(R.id.edit_clinics)
-    Button editClinicButton;
     @BindView(R.id.progress_bar)
     ProgressBar progress;
     @BindView(R.id.nested_scroll)
@@ -127,18 +125,12 @@ public class AddDoctorActivity extends BaseLocationActivity {
     private ArrayAdapter<String> nursingArrayAdapter;
     private int specialtyID;
 
-    public static Intent newAddDoctorIntent(Context context, DoctorDetail doctorDetail) {
-        Intent intent = new Intent(context, AddDoctorActivity.class);
-        intent.putExtra(ARG_Detail, doctorDetail);
-        return intent;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_doctor);
         ButterKnife.bind(this);
-        newDoctor = true;
         if (Connectivity.isConnected(this)){
             internetConnection = true;
         }else{
@@ -149,24 +141,10 @@ public class AddDoctorActivity extends BaseLocationActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        if (getIntent().hasExtra(ARG_Detail)) {
-            doctorDetail = getDoctorDetail();
-            addViewValues(doctorDetail);
             getSpecialities();
-            newDoctor = false;
-            specialtyID = doctorDetail.getSpecialityID();
-        } else {
-            editClinicButton.setEnabled(false);
-            editClinicButton.setVisibility(View.GONE);
-        }
-
     }
 
-    public DoctorDetail getDoctorDetail() {
-        Intent intent = getIntent();
-        DoctorDetail doctorDetail = (DoctorDetail) intent.getSerializableExtra(ARG_Detail);
-        return doctorDetail;
-    }
+
 
     @OnClick(R.id.location_icon)
     public void getlocationClick() {
@@ -221,24 +199,14 @@ public class AddDoctorActivity extends BaseLocationActivity {
 
             @Override
             public void onFailure(Call<GeoCoderResult> call, Throwable t) {
-                Toast.makeText(AddDoctorActivity.this, ""+t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddDoctorActivity.this, "can't fetch location", Toast.LENGTH_SHORT).show();
 
             }
         });
     }
 
 
-    public void addViewValues(DoctorDetail doctorDetail) {
-        doctorNameEditText.setText(doctorDetail.getName());
-        doctorNameAREditText.setText(doctorDetail.getNameAR());
-        addressEditText.setText(doctorDetail.getLocation());
-        pphoneEditText.setText(doctorDetail.getMobileNumber());
-        arabicDescription.setText(doctorDetail.getDescriptionAR());
-        englishDescription.setText(doctorDetail.getDescription());
-        specialitySpinner.setText(doctorDetail.getSpeciality());
-        emailEditText.setText(doctorDetail.getEmail().toString());
-        location.setText(doctorDetail.getLocation());
-    }
+
 
     public void saveCreateInDB(CreateDoctorRequest createDoctorRequest){
         CreateDoctorDB createDoctorDB = new CreateDoctorDB();
@@ -262,19 +230,6 @@ public class AddDoctorActivity extends BaseLocationActivity {
         createDoctorDB.save();
     }
 
-    public void saveUpdateInDB(UpdateDoctorRequest updateDoctorRequest){
-        UpdateDoctorDb updateDoctorDb = new UpdateDoctorDb();
-        updateDoctorDb.setSpecialityID((int)specialtyID);
-        updateDoctorDb.setNameAR(updateDoctorRequest.getNameAR());
-        updateDoctorDb.setName(updateDoctorRequest.getName());
-        updateDoctorDb.setDescrpition(updateDoctorRequest.getDescrpition());
-        updateDoctorDb.setDescrpitionAR(updateDoctorRequest.getDescrpitionAR());
-        updateDoctorDb.setDoctorID(updateDoctorRequest.getDoctorID());
-        updateDoctorDb.setEmail(updateDoctorRequest.getEmail());
-        updateDoctorDb.setLang(updateDoctorRequest.getLang());
-        updateDoctorDb.setMobileNumber(updateDoctorDb.getMobileNumber());
-        updateDoctorDb.save();
-    }
 
     public void saveSpeciality(List<Speciality> specialites){
         if (specialites != null && specialites.size()!=0){
@@ -300,19 +255,14 @@ public class AddDoctorActivity extends BaseLocationActivity {
             nestedScroll.fullScroll(View.FOCUS_UP);
             saveIcon.setEnabled(false);
             progress.setVisibility(View.VISIBLE);
-
             updateDoctor();
 
         }else{
+            saveIcon.setEnabled(true);
             Toast.makeText(this,R.string.empty_feild, Toast.LENGTH_SHORT).show();
         }
     }
 
-    @OnClick(R.id.edit_clinics)
-    public void EditClinic() {
-        Intent intent = ClinicsActivity.newClinics(this, doctorDetail.getDoctorID());
-        startActivity(intent);
-    }
 
 
     @Override
@@ -419,19 +369,7 @@ public class AddDoctorActivity extends BaseLocationActivity {
         return valid;
     }
 
-    public UpdateDoctorRequest getUpdateDoctorRequest() {
-        UpdateDoctorRequest updateDoctorRequest = new UpdateDoctorRequest();
-        updateDoctorRequest.setDescrpition(englishDescription.getText().toString());
-        updateDoctorRequest.setDescrpitionAR(arabicDescription.getText().toString());
-        updateDoctorRequest.setDoctorID(doctorDetail.getDoctorID());
-        updateDoctorRequest.setEmail(emailEditText.getText().toString());
-        updateDoctorRequest.setMobileNumber(pphoneEditText.getText().toString());
-        updateDoctorRequest.setName(doctorNameEditText.getText().toString());
-        updateDoctorRequest.setNameAR(doctorNameAREditText.getText().toString());
-        updateDoctorRequest.setLang(Locale.getDefault().getDisplayLanguage());
-        updateDoctorRequest.setSpecialityID((int) specialtyID);
-        return updateDoctorRequest;
-    }
+
 
     public CreateDoctorRequest createDoctorRequest() {
         CreateDoctorRequest createDoctorRequest = new CreateDoctorRequest();
@@ -649,11 +587,11 @@ public class AddDoctorActivity extends BaseLocationActivity {
                                 specialtiesArrayAdapter.notifyDataSetChanged();
                         }
                     } else {
-                        Toast.makeText(AddDoctorActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
+                        getSpecialityFromDB();
 
                     }
                 } else {
-                    Toast.makeText(AddDoctorActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
+                    getSpecialityFromDB();
 
                 }
             }
@@ -663,12 +601,13 @@ public class AddDoctorActivity extends BaseLocationActivity {
             public void onFailure(Call<SpecialityGeneralResponse> call, Throwable t) {
                 Toast.makeText(AddDoctorActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "onFailure: " + t.getMessage());
+                getSpecialityFromDB();
+
             }
         });
     }
 
     public void updateDoctor() {
-        if (newDoctor) {
             if (! Connectivity.isConnected(this)){
                 saveCreateInDB(createDoctorRequest());
                 Toast.makeText(this, R.string.network_error + getString(R.string.request_saved), Toast.LENGTH_SHORT).show();
@@ -676,16 +615,9 @@ public class AddDoctorActivity extends BaseLocationActivity {
                 return;
             }
             updateDoctorResponseCall = NetworkProvider.provideNetworkMethods(this).createNewDoctor(createDoctorRequest());
+        progress.setVisibility(View.VISIBLE);
 
-        } else {
-            if (! Connectivity.isConnected(this)){
-                saveUpdateInDB(getUpdateDoctorRequest());
-                Toast.makeText(this, R.string.network_error + getString(R.string.request_saved), Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            }
-            updateDoctorResponseCall = NetworkProvider.provideNetworkMethods(this).updateDoctor(getUpdateDoctorRequest());
-        }
+
         updateDoctorResponseCall.enqueue(new Callback<UpdateDoctorResponse>() {
             @Override
             public void onResponse(Call<UpdateDoctorResponse> call, Response<UpdateDoctorResponse> response) {
@@ -693,11 +625,7 @@ public class AddDoctorActivity extends BaseLocationActivity {
                     if (response.body().isSuccess()) {
                         progress.setVisibility(View.GONE);
                         saveIcon.setEnabled(true);
-                        if (newDoctor) {
                             Toast.makeText(AddDoctorActivity.this, R.string.doctor_added, Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(AddDoctorActivity.this, R.string.doctor_updated, Toast.LENGTH_SHORT).show();
-                        }
                         finish();
 
                     } else {
@@ -710,7 +638,6 @@ public class AddDoctorActivity extends BaseLocationActivity {
                     Toast.makeText(AddDoctorActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
                     progress.setVisibility(View.GONE);
                     saveIcon.setEnabled(true);
-
 
                 }
             }

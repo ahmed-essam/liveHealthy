@@ -77,4 +77,7 @@
     <string name="add_clinic">add clinic</string>
     <string name="request_saved">request saved</string>
     <string name="start">stopped</string>
+    <string name="clinic_added">clinic added</string>
+    <string name="clinic_updated">clinic updated</string>
+    <string name="edit_doctor">edit doctor</string>
 </resources>

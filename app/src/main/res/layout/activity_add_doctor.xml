@@ -398,19 +398,6 @@
             android:selectAllOnFocus="true"
             />
 
-        <Button
-            android:id="@+id/edit_clinics"
-            style="@style/Base.Widget.AppCompat.Button.Borderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:background="@color/colorPrimary"
-            android:text="@string/edit_clinic"
-            android:textAllCaps="false"
-            android:textColor="@color/textColorDark" />
 
 
     </LinearLayout>

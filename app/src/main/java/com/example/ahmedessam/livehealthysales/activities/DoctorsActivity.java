@@ -13,11 +13,13 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.ahmedessam.livehealthysales.R;
 import com.example.ahmedessam.livehealthysales.adapters.DoctorsAdapter;
 import com.example.ahmedessam.livehealthysales.database.CreateDoctorDB;
@@ -64,7 +66,6 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     TextView unSaveCount;
 
     //variables
-
     boolean isSuccess;
     DoctorsAdapter doctorsAdapter;
     Call<AllDoctorsResponse> responceCall;
@@ -72,6 +73,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     Call<UpdateDoctorResponse> createDoctorResponse;
     private EndlessRecyclerViewScrollListener scrollListener;
     private int pageNum;
+    Animation rotateAboutCenterAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +90,9 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
         } else {
             unSaveCount.setVisibility(View.GONE);
         }
+          rotateAboutCenterAnimation = AnimationUtils.loadAnimation(this,R.anim.loade_animation);
+        rotateAboutCenterAnimation.setRepeatCount(Animation.INFINITE);
+
 
         fetchDoctors("");
         setSupportActionBar(doctorsToolbar);
@@ -170,6 +175,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
     @OnClick(R.id.refresh_icon)
     public void refreshRequests() {
+//        refreshIcon.startAnimation(rotateAboutCenterAnimation);
         if (Connectivity.isConnected(this)) {
             if (getRequestsNum() > 0) {
                 List<CreateDoctorDB> createDoctorDBList = SQLite.select().from(CreateDoctorDB.class).queryList();
@@ -178,23 +184,23 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                     for (int i = 0; i < createDoctorDBList.size(); i++) {
                         CreateDoctorDB createDoctorDB = createDoctorDBList.get(i);
                         CreateDoctorRequest createDoctorRequest = createDoctorRequest(createDoctorDB);
-                        createDoctor(createDoctorRequest);
-                        if (isSuccess){
-                           createDoctorDB.delete();
-
-                            unSaveCount.setText(""+getRequestsNum());
-                        }
+                        createDoctor(createDoctorRequest,createDoctorDB);
+//                        if (isSuccess){
+//                           createDoctorDB.delete();
+//
+//                            unSaveCount.setText(""+getRequestsNum());
+//                        }
                     }
                 }
                 if (updateDoctorDbList.size()>0){
                     for (int i = 0; i < updateDoctorDbList.size(); i++) {
                         UpdateDoctorDb updateDoctorDb = updateDoctorDbList.get(i);
                         UpdateDoctorRequest updateDoctorRequest = getUpdateDoctorRequest(updateDoctorDb);
-                        updateDoctor(updateDoctorRequest);
-                        if (isSuccess){
-                            updateDoctorDb.delete();
-                            unSaveCount.setText(""+(Integer.parseInt(unSaveCount.getText().toString())-1));
-                        }
+                        updateDoctor(updateDoctorRequest,updateDoctorDb);
+//                        if (isSuccess){
+//                            updateDoctorDb.delete();
+//                            unSaveCount.setText(""+(Integer.parseInt(unSaveCount.getText().toString())-1));
+//                        }
                     }
                 }
 
@@ -301,9 +307,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
         return createDoctorRequest;
     }
 
-    public void updateDoctor(UpdateDoctorRequest updateDoctorRequest) {
-        doctorRecyclerView.setEnabled(false);
-        mSwipeRefreshLayout.setEnabled(false);
+    public void updateDoctor(UpdateDoctorRequest updateDoctorRequest , final UpdateDoctorDb updateDoctorDb) {
         updateDoctorResponseCall = NetworkProvider.provideNetworkMethods(this).updateDoctor(updateDoctorRequest);
         updateDoctorResponseCall.enqueue(new Callback<UpdateDoctorResponse>() {
             @Override
@@ -312,7 +316,9 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                     if (response.body().isSuccess()) {
                         isSuccess = true;
                         Toast.makeText(DoctorsActivity.this, R.string.doctor_updated, Toast.LENGTH_SHORT).show();
-
+                        if (updateDoctorDb.delete()){
+                            unSaveCount.setText(""+getRequestsNum());
+                        }
                     } else {
                         isSuccess = false;
                         Toast.makeText(DoctorsActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
@@ -334,7 +340,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
     }
 
-    public void createDoctor(CreateDoctorRequest createDoctorRequest) {
+    public void createDoctor(CreateDoctorRequest createDoctorRequest , final CreateDoctorDB createDoctorDB) {
         createDoctorResponse = NetworkProvider.provideNetworkMethods(this).createNewDoctor(createDoctorRequest);
         createDoctorResponse.enqueue(new Callback<UpdateDoctorResponse>() {
             @Override
@@ -343,6 +349,9 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                     if (response.body().isSuccess()) {
                         isSuccess = true;
                         Toast.makeText(DoctorsActivity.this, R.string.doctor_added, Toast.LENGTH_SHORT).show();
+                        if(createDoctorDB.delete()){
+                           unSaveCount.setText(""+getRequestsNum());
+                        }
                     } else {
                         isSuccess = false;
                         Toast.makeText(DoctorsActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();

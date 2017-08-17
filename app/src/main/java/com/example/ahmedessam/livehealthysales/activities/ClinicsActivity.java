@@ -102,6 +102,15 @@ public class ClinicsActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
 
     }
+
+    @Override
+    protected void onStop() {
+        if (clinicResponceCall != null) {
+            clinicResponceCall.cancel();
+        }
+        super.onStop();
+    }
+
     public Boolean verifyClinicResponse(Response<ClinicGeneralResponse> response) {
         if (response.isSuccessful()) {
             if (response.body().isSuccess()) {
@@ -143,4 +152,5 @@ public class ClinicsActivity extends AppCompatActivity {
             }
         });
     }
+
 }
