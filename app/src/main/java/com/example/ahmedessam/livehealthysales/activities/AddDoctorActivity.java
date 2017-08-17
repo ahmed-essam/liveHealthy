@@ -23,6 +23,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.ahmedessam.livehealthysales.R;
+import com.example.ahmedessam.livehealthysales.database.CreateDoctorDB;
+import com.example.ahmedessam.livehealthysales.database.UpdateDoctorDb;
 import com.example.ahmedessam.livehealthysales.model_dto.request.CreateDoctorRequest;
 import com.example.ahmedessam.livehealthysales.model_dto.request.UpdateDoctorRequest;
 import com.example.ahmedessam.livehealthysales.model_dto.response.GeoCoderResult;
@@ -31,6 +33,8 @@ import com.example.ahmedessam.livehealthysales.model_dto.response.response_class
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.updateDoctor.UpdateDoctorResponse;
 import com.example.ahmedessam.livehealthysales.models.DoctorDetail;
 import com.example.ahmedessam.livehealthysales.network.NetworkProvider;
+import com.example.ahmedessam.livehealthysales.util.Connectivity;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,6 +102,7 @@ public class AddDoctorActivity extends BaseLocationActivity {
     @BindView(R.id.nested_scroll)
     NestedScrollView nestedScroll;
 
+    boolean internetConnection;
     Call<SpecialityGeneralResponse> specialityGeneralResponseCall;
     Call<UpdateDoctorResponse> updateDoctorResponseCall;
     Call<GeoCoderResult> geoCoderResultCall;
@@ -134,6 +139,11 @@ public class AddDoctorActivity extends BaseLocationActivity {
         setContentView(R.layout.activity_add_doctor);
         ButterKnife.bind(this);
         newDoctor = true;
+        if (Connectivity.isConnected(this)){
+            internetConnection = true;
+        }else{
+            internetConnection = false;
+        }
         specialites = new ArrayList<>();
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -230,13 +240,69 @@ public class AddDoctorActivity extends BaseLocationActivity {
         location.setText(doctorDetail.getLocation());
     }
 
+    public void saveCreateInDB(CreateDoctorRequest createDoctorRequest){
+        CreateDoctorDB createDoctorDB = new CreateDoctorDB();
+        createDoctorDB.setSocialMedia(createDoctorRequest.getSocialMedia());
+        createDoctorDB.setConsultantID(createDoctorRequest.getConsultantID());
+        createDoctorDB.setDescription(createDoctorRequest.getDescription());
+        createDoctorDB.setDescriptionAR(createDoctorRequest.getDescriptionAR());
+        createDoctorDB.setEmail(createDoctorRequest.getEmail());
+        createDoctorDB.setGender(createDoctorRequest.getGender());
+        createDoctorDB.setHouseVisit(createDoctorRequest.getHouseVisit());
+        createDoctorDB.setLandLine(createDoctorRequest.getLandLine());
+        createDoctorDB.setLang(createDoctorRequest.getLang());
+        createDoctorDB.setLocation(createDoctorRequest.getLocation());
+        createDoctorDB.setMobileNumber(createDoctorRequest.getMobileNumber());
+        createDoctorDB.setName(createDoctorRequest.getName());
+        createDoctorDB.setNameAR(createDoctorRequest.getNameAR());
+        createDoctorDB.setNursery(createDoctorRequest.getNursery());
+        createDoctorDB.setSpecialityID((int)specialtyID);
+        createDoctorDB.setTitle(createDoctorRequest.getTitle());
+        createDoctorDB.setTitleAR(createDoctorRequest.getTitleAR());
+        createDoctorDB.save();
+    }
+
+    public void saveUpdateInDB(UpdateDoctorRequest updateDoctorRequest){
+        UpdateDoctorDb updateDoctorDb = new UpdateDoctorDb();
+        updateDoctorDb.setSpecialityID((int)specialtyID);
+        updateDoctorDb.setNameAR(updateDoctorRequest.getNameAR());
+        updateDoctorDb.setName(updateDoctorRequest.getName());
+        updateDoctorDb.setDescrpition(updateDoctorRequest.getDescrpition());
+        updateDoctorDb.setDescrpitionAR(updateDoctorRequest.getDescrpitionAR());
+        updateDoctorDb.setDoctorID(updateDoctorRequest.getDoctorID());
+        updateDoctorDb.setEmail(updateDoctorRequest.getEmail());
+        updateDoctorDb.setLang(updateDoctorRequest.getLang());
+        updateDoctorDb.setMobileNumber(updateDoctorDb.getMobileNumber());
+        updateDoctorDb.save();
+    }
+
+    public void saveSpeciality(List<Speciality> specialites){
+        if (specialites != null && specialites.size()!=0){
+            Speciality.clearSpecialityDB();
+            for (int i=0;i<specialites.size();i++){
+                 Speciality speciality = specialites.get(i);
+                speciality.save();
+            }
+        }
+    }
+
+    public void getSpecialityFromDB(){
+        List<Speciality> specialityList = SQLite.select().from(Speciality.class).queryList();
+        if (specialityList.size() !=0){
+            specialites.clear();
+            specialites.addAll(specialityList);
+        }
+    }
+
     @OnClick(R.id.save_icon)
     public void save() {
         if (verify()) {
             nestedScroll.fullScroll(View.FOCUS_UP);
             saveIcon.setEnabled(false);
             progress.setVisibility(View.VISIBLE);
+
             updateDoctor();
+
         }else{
             Toast.makeText(this,R.string.empty_feild, Toast.LENGTH_SHORT).show();
         }
@@ -562,6 +628,10 @@ public class AddDoctorActivity extends BaseLocationActivity {
 
 
     public void getSpecialities() {
+        if (! Connectivity.isConnected(this)){
+            getSpecialityFromDB();
+         return;
+        }
         specialityGeneralResponseCall = NetworkProvider.provideNetworkMethods(this).getSpeciality(1, 10000);
         specialityGeneralResponseCall.enqueue(new Callback<SpecialityGeneralResponse>() {
             @Override
@@ -573,6 +643,7 @@ public class AddDoctorActivity extends BaseLocationActivity {
                             if (list != null) {
                                 specialites.clear();
                                 specialites.addAll(list);
+                                saveSpeciality(list);
                             }
                             if (specialtiesArrayAdapter != null)
                                 specialtiesArrayAdapter.notifyDataSetChanged();
@@ -598,9 +669,21 @@ public class AddDoctorActivity extends BaseLocationActivity {
 
     public void updateDoctor() {
         if (newDoctor) {
+            if (! Connectivity.isConnected(this)){
+                saveCreateInDB(createDoctorRequest());
+                Toast.makeText(this, R.string.network_error + getString(R.string.request_saved), Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
             updateDoctorResponseCall = NetworkProvider.provideNetworkMethods(this).createNewDoctor(createDoctorRequest());
 
         } else {
+            if (! Connectivity.isConnected(this)){
+                saveUpdateInDB(getUpdateDoctorRequest());
+                Toast.makeText(this, R.string.network_error + getString(R.string.request_saved), Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
             updateDoctorResponseCall = NetworkProvider.provideNetworkMethods(this).updateDoctor(getUpdateDoctorRequest());
         }
         updateDoctorResponseCall.enqueue(new Callback<UpdateDoctorResponse>() {

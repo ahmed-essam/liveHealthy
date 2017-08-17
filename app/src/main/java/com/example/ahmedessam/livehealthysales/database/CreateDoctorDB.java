@@ -1,51 +1,73 @@
-package com.example.ahmedessam.livehealthysales.model_dto.request;
+package com.example.ahmedessam.livehealthysales.database;
 
 import com.google.gson.annotations.SerializedName;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
-/**
- * Created by ahmed essam on 10/08/2017.
- */
+import java.util.List;
 
-public class CreateDoctorRequest extends BaseModel {
-    @SerializedName("House_Visit")
+/**
+ * Created by ahmed essam on 16/08/2017.
+ */
+@Table(database = AppDataBase.class)
+public class CreateDoctorDB extends BaseModel{
+    @PrimaryKey(autoincrement = true)
+    private long id;
+    @Column
     private Boolean houseVisit;
-    @SerializedName("Consultant_ID")
+    @Column
     private Integer consultantID;
-    @SerializedName("Description")
+    @Column
     private String description;
-    @SerializedName("Description_AR")
+    @Column
     private String descriptionAR;
-    @SerializedName("Email")
+    @Column
     private String email;
-    @SerializedName("Gender")
+    @Column
     private String gender;
-    @SerializedName("Land_Line")
+    @Column
     private String landLine;
-    @SerializedName("Location")
+    @Column
     private String location;
-    @SerializedName("Mobile_Number")
+    @Column
     private String mobileNumber;
-    @SerializedName("Name")
+    @Column
     private String name;
-    @SerializedName("Name_AR")
+    @Column
     private String nameAR;
-    @SerializedName("Nursery")
+    @Column
     private Boolean nursery;
-    @SerializedName("Social_Media")
+    @Column
     private String socialMedia;
-    @SerializedName("Speciality_ID")
+    @Column
     private Integer specialityID;
-    @SerializedName("Title")
+    @Column
     private String title;
-    @SerializedName("Title_AR")
+    @Column
     private String titleAR;
-    @SerializedName("Work_Auth_No")
+    @Column
     private String workAuthNo;
-    @SerializedName("lang")
+    @Column
     private String lang;
 
-    public Boolean getHouseVisit() {
+    public static void ClearCreateDoctorDB(){
+        List<CreateDoctorDB> movieList = SQLite.select().from(CreateDoctorDB.class).queryList();
+        FlowManager.getModelAdapter(CreateDoctorDB.class).deleteAll(movieList);
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Boolean isHouseVisit() {
         return houseVisit;
     }
 
@@ -133,7 +155,7 @@ public class CreateDoctorRequest extends BaseModel {
         this.nameAR = nameAR;
     }
 
-    public Boolean getNursery() {
+    public Boolean isNursery() {
         return nursery;
     }
 

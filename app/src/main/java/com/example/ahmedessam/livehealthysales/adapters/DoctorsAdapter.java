@@ -55,7 +55,9 @@ public class DoctorsAdapter extends RecyclerView.Adapter<DoctorsAdapter.ViewHold
 
         @Override
         public void onClick(View view) {
-            Intent intent = DoctorDetailActivity.newDoctorDetail(getContext(),doctors.get(getPosition()).getDoctorID());
+            Intent intent = DoctorDetailActivity.newDoctorDetail(getContext(),
+                    doctors.get(getPosition()).getDoctorID(),
+                    doctors.get(getPosition()).isDeleted());
             getContext().startActivity(intent);
         }
     }

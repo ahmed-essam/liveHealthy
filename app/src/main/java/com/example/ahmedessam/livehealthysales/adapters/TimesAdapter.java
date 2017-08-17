@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ahmedessam.livehealthysales.R;
@@ -55,7 +57,6 @@ public class TimesAdapter extends RecyclerView.Adapter<TimesAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.bindView(dayList.get(position));
-
     }
 
     public void addAll(List<Day> days) {
@@ -73,18 +74,25 @@ public class TimesAdapter extends RecyclerView.Adapter<TimesAdapter.ViewHolder> 
         TextView dayText;
 
         TextView appointments;
+        ImageButton delete;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
             dayText =(TextView)itemView.findViewById(R.id.day);
             appointments=(TextView)itemView.findViewById(R.id.appointment);
+            delete = (ImageButton) itemView.findViewById(R.id.cancelButton);
 
         }
 
         public void bindView(Day day) {
             dayText.setText(day.getDay());
-            String s = createTime(day.getFromHour(), day.getToHour());
-            appointments.setText(s);
+           appointments.setText(
+                    String.format("%s %s %s %s",
+                            itemView.getContext().getString(R.string.from), formatTime(day.getFromHour()),
+                            itemView.getContext().getString(R.string.to), formatTime(day.getToHour()))
+            );
+
         }
 
         public String createTime(String fromTime, String toTime) {

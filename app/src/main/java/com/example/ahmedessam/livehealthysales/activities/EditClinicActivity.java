@@ -140,7 +140,11 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
                 return;
             }
             doctorID = getIntent().getLongExtra(Doctor_id, 0);
-            clinic = clinics.get(index);
+            if (index == -2){
+                clinic = new Clinic();
+            }else {
+                clinic = clinics.get(index);
+            }
             isCreate = getIntent().getBooleanExtra(Create,false);
         }
         if (isCreate){
@@ -232,6 +236,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
         clinic.setAreaName(area.getText().toString());
         if (isCreate){
             clinic.setClinicID(0);
+            clinics.add(clinic);
             UpdateDoctorClinicsRequestBody clinicsRequestBody = new UpdateDoctorClinicsRequestBody();
             clinicsRequestBody.setDoctor_ID((int) doctorID);
             clinicsRequestBody.setLang(Locale.getDefault().getDisplayLanguage());

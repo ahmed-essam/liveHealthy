@@ -29,7 +29,7 @@
     <string name="no_data">No Data</string>
     <string name="from">from</string>
     <string name="to">to</string>
-    <string name="doctor_deleted">Doctor deleted</string>
+    <string name="doctor_deleted">Doctor stopped</string>
     <string name="edit_clinic">Edit clinic</string>
     <string name="empty_name">empty name</string>
     <string name="empty_feild">empty feild</string>
@@ -75,4 +75,6 @@
     <string name="there_is_no_clinics">there is no clinics</string>
     <string name="no_schedule">no schedule</string>
     <string name="add_clinic">add clinic</string>
+    <string name="request_saved">request saved</string>
+    <string name="start">stopped</string>
 </resources>

@@ -75,7 +75,7 @@ public class ClinicsActivity extends AppCompatActivity {
 
     @OnClick(R.id.add_clinic_button)
     public void addClinic(){
-        EditClinicActivity.start(ClinicsActivity.this,clinics,0,(long)doctorID,true);
+        EditClinicActivity.start(ClinicsActivity.this,clinics,-2,(long)doctorID,true);
     }
 
     @Override

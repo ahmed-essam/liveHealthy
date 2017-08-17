@@ -24,6 +24,7 @@ import com.example.ahmedessam.livehealthysales.model_dto.response.response_class
 import com.example.ahmedessam.livehealthysales.models.Clinic;
 import com.example.ahmedessam.livehealthysales.models.DoctorDetail;
 import com.example.ahmedessam.livehealthysales.network.NetworkProvider;
+import com.example.ahmedessam.livehealthysales.util.Connectivity;
 import com.example.ahmedessam.livehealthysales.util.UserHelper;
 
 import java.util.List;
@@ -40,6 +41,7 @@ import retrofit2.Response;
 public class DoctorDetailActivity extends AppCompatActivity {
 
     public static final String DoctorArg = "doctor_id";
+    public static final String DeletedArg = "deleted";
     @BindView(R.id.detail_toolbar)
     Toolbar detailToolbar;
     @BindView(R.id.detail_doctor_image)
@@ -76,11 +78,13 @@ public class DoctorDetailActivity extends AppCompatActivity {
     DoctorDetail doctorDetail;
     private int datesState;
     private int doctorId;
+    boolean isDeleted;;
 
-    public static Intent newDoctorDetail(Context context, int doctor) {
-        Intent intent = new Intent(context, DoctorDetailActivity.class);
-        intent.putExtra(DoctorArg, doctor);
-        return intent;
+    public static Intent newDoctorDetail(Context context, int doctor,boolean deleted) {
+        Intent intent1 = new Intent(context, DoctorDetailActivity.class);
+        intent1.putExtra(DoctorArg, doctor);
+        intent1.putExtra(DeletedArg,deleted);
+        return intent1;
     }
 
     @Override
@@ -94,6 +98,11 @@ public class DoctorDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         doctorId = getDoctorId();
+        if (isDeleted){
+            stopButton.setText(R.string.start);
+        }else{
+            stopButton.setText(R.string.stop);
+        }
         fetchDoctorDetail();
         datesIcons.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,9 +115,19 @@ public class DoctorDetailActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_button)
     public void setEditButton() {
+        if (Connectivity.isConnected(this)){
+            startActivity(new Intent(this, AddDoctorActivity.class));
+        }
         if (doctorDetail != null) {
             Intent intent = AddDoctorActivity.newAddDoctorIntent(this, doctorDetail);
             startActivity(intent);
+        }
+    }
+
+    @OnClick(R.id.stop_button)
+    public void stopDoctor(){
+        if (!isDeleted) {
+            deleteDoctor();
         }
     }
 
@@ -127,17 +146,19 @@ public class DoctorDetailActivity extends AppCompatActivity {
 
     public int getDoctorId() {
         int id = getIntent().getIntExtra(DoctorArg, 0);
+        isDeleted = getIntent().getBooleanExtra(DeletedArg,false);
         return id;
     }
 
     public void addView(DoctorDetail response) {
-        if (Locale.getDefault().getDisplayLanguage().equals("العربيه") && response.getNameAR() != null) {
+        if (Locale.getDefault().getDisplayLanguage().equals("العربيه") ) {
             doctorName.setText(response.getNameAR());
 
         } else {
+
             doctorName.setText(response.getName());
         }
-        if ("ar".equals(UserHelper.getAppLang(this)) && response.getDescriptionAR() != null) {
+        if ("ar".equals(UserHelper.getAppLang(this))) {
             id.setText(response.getDescriptionAR());
         } else {
             id.setText(response.getDescription());
@@ -161,7 +182,13 @@ public class DoctorDetailActivity extends AppCompatActivity {
         if (response.isSuccessful()) {
             if (response.body().isSuccess()) {
                 if (response.body().getDetailResponse() != null) {
-                    return true;
+                    if (response.body().getDetailResponse().getDoctorDetials() !=null) {
+                        return true;
+                    }else {
+                        Toast.makeText(this, R.string.no_data, Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
                 } else {
                     Toast.makeText(this, R.string.no_data, Toast.LENGTH_SHORT).show();
                     return false;
@@ -251,18 +278,17 @@ public class DoctorDetailActivity extends AppCompatActivity {
             public void onResponse(Call<DeleteDoctorGeneralResponse> call, Response<DeleteDoctorGeneralResponse> response) {
                 if (response.isSuccessful()) {
                     if (response.body().isSuccess()) {
-                        if (response.body() != null) {
+                        stopButton.setText(R.string.start);
+                        isDeleted = true;
                             Toast.makeText(DoctorDetailActivity.this, R.string.doctor_deleted, Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(DoctorDetailActivity.this, DoctorsActivity.class));
-                        } else {
-                            Toast.makeText(DoctorDetailActivity.this, R.string.no_data, Toast.LENGTH_SHORT).show();
-
-                        }
                     } else {
+                        stopButton.setText(R.string.start);
+
                         Toast.makeText(DoctorDetailActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
 
                     }
                 } else {
+                    stopButton.setText(R.string.start);
                     Toast.makeText(DoctorDetailActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
 
                 }
