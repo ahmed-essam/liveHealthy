@@ -23,6 +23,9 @@ import android.widget.Toast;
 
 import com.example.ahmedessam.livehealthysales.R;
 import com.example.ahmedessam.livehealthysales.adapters.ScheduleAdapter;
+import com.example.ahmedessam.livehealthysales.database.ClinicDataBase;
+import com.example.ahmedessam.livehealthysales.database.CreateClinicDB;
+import com.example.ahmedessam.livehealthysales.database.CreateClinicDB_Table;
 import com.example.ahmedessam.livehealthysales.model_dto.request.UpdateDoctorClinicsRequestBody;
 import com.example.ahmedessam.livehealthysales.model_dto.request.UpdateDoctorTimesRequestBody;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.Areas.Area;
@@ -35,6 +38,7 @@ import com.example.ahmedessam.livehealthysales.models.Clinic;
 import com.example.ahmedessam.livehealthysales.models.Day;
 import com.example.ahmedessam.livehealthysales.network.NetworkProvider;
 import com.example.ahmedessam.livehealthysales.util.AddScheduleDialog;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +62,8 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
     private static final String Doctor_id = "DoctorID";
     private static final String Create = "isCreate";
     private static final String KEY_CLINICS = "CLINICS";
+    private static final String KEY_ONLINE = "online";
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.progressBar)
@@ -77,7 +83,6 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
     TextInputEditText addressAr;
     @BindView(R.id.mobileNumber)
     TextInputEditText mobileNumber;
-
     @BindView(R.id.price)
     TextInputEditText price;
     @BindView(R.id.discount)
@@ -88,6 +93,8 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
     RecyclerView scheduleRecycler;
     @BindView(R.id.addSchedule)
     ImageButton addScedule;
+    @BindView(R.id.schedule_layout)
+    ImageButton scheduleLayout;
 
     private ArrayList<Clinic> clinics;
     private int index;
@@ -112,13 +119,15 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
 
     private int areaID, cityID;
     boolean isCreate;
+    boolean isOnline;
 
-    public static void start(Context context, ArrayList<Clinic> clinics, int index, long doctorID , boolean create) {
+    public static void start(Context context, ArrayList<Clinic> clinics, int index, long doctorID , boolean create , boolean online) {
         Intent starter = new Intent(context, EditClinicActivity.class);
         starter.putParcelableArrayListExtra(KEY_CLINICS, clinics);
         starter.putExtra(KEY_INDEX, index);
         starter.putExtra(Doctor_id, doctorID);
         starter.putExtra(Create, create);
+        starter.putExtra(KEY_ONLINE,online);
         context.startActivity(starter);
     }
 
@@ -134,6 +143,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
 
         if (getIntent() != null) {
             index = getIntent().getIntExtra(KEY_INDEX, -1);
+            isOnline = getIntent().getBooleanExtra(KEY_ONLINE,false);
             clinics = getIntent().getParcelableArrayListExtra(KEY_CLINICS);
             if (index == -1 || clinics == null || clinics.size() <= index || Doctor_id == null) {
                 finish();
@@ -152,8 +162,13 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
             addScedule.setVisibility(View.GONE);
 
         }
-
-
+        if (!isOnline){
+            scheduleRecycler.setVisibility(View.GONE);
+            scheduleLayout.setVisibility(View.GONE);
+        }else{
+            scheduleRecycler.setVisibility(View.VISIBLE);
+            scheduleLayout.setVisibility(View.VISIBLE);
+        }
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -170,33 +185,64 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
         scheduleRecycler.setLayoutManager(new LinearLayoutManager(this));
         scheduleRecycler.setNestedScrollingEnabled(false);
         if (!isCreate) {
-            fetchSchedule();
+            if (isOnline) {
+                fetchSchedule();
+            }
             showDate();
         }else{
-            fetchCities();
-            fetchAreas();
+            if (isOnline) {
+                fetchCities();
+                fetchAreas();
+            }else{
+                fetchCitiesFromDB();
+                fetchAreasFromDB();
+            }
         }
 
     }
 
 
     private void showDate() {
+            name.setText(clinic.getClinicName());
+            nameAr.setText(clinic.getClinicNameAR());
+            requests.setText(String.valueOf(clinic.getRequestsPerDay()));
+            price.setText(String.valueOf(clinic.getPrice()));
+            addressAr.setText(clinic.getAddressAR());
+            address.setText(clinic.getAddress());
+            mobileNumber.setText(clinic.getMobileNumber());
+            discount.setText(String.valueOf(clinic.getDiscount()));
+            city.setText(clinic.getCityName());
+            area.setText(clinic.getAreaName());
+            cityID = clinic.getCityID();
+            areaID = clinic.getAreaID();
+        if (isOnline) {
+            fetchCities();
+            fetchAreas();
+        }else{
+            fetchCitiesFromDB();
+            fetchAreasFromDB();
+        }
+    }
 
-        name.setText(clinic.getClinicName());
-        nameAr.setText(clinic.getClinicNameAR());
-        requests.setText(String.valueOf(clinic.getRequestsPerDay()));
-        price.setText(String.valueOf(clinic.getPrice()));
-        addressAr.setText(clinic.getAddressAR());
-        address.setText(clinic.getAddress());
-        mobileNumber.setText(clinic.getMobileNumber());
-        discount.setText(String.valueOf(clinic.getDiscount()));
-        city.setText(clinic.getCityName());
-        area.setText(clinic.getAreaName());
-        cityID = clinic.getCityID();
-        areaID = clinic.getAreaID();
-        fetchCities();
-        fetchAreas();
-
+    public void fetchCitiesFromDB(){
+        cities = SQLite.select().from(City.class).queryList();
+    }
+    public void fetchAreasFromDB(){
+        areas = SQLite.select().from(Area.class).queryList();
+    }
+    public void saveCitiesInDB(List<City> cityList){
+        City.clearCitiesDB();
+        for (int i =0 ; i<cityList.size();i++){
+            City city = cityList.get(i);
+            city.save();
+        }
+    }
+    public void saveAreasInDB(List<Area> areaList){
+        Area.clearAreasDB();
+        for (int i =0 ; i<areaList.size();i++){
+            Area area = areaList.get(i);
+            area.save();
+        }
     }
 
     @Override
@@ -219,6 +265,38 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
         return super.onOptionsItemSelected(item);
     }
 
+    public void saveInDB( List<Clinic> clinics){
+        CreateClinicDB createClinicDB = new CreateClinicDB();
+        createClinicDB.setLang(Locale.getDefault().getDisplayLanguage());
+        createClinicDB.setDoctor_ID(doctorID);
+        createClinicDB.save();
+        int clinicID = SQLite.select(CreateClinicDB_Table.clinicID).from(CreateClinicDB.class).where(CreateClinicDB_Table.Doctor_ID_id.eq(doctorID)).hashCode();
+        for (int i = 0;i<clinics.size();i++) {
+            Clinic clinic = clinics.get(i);
+            ClinicDataBase clinicDataBase = new ClinicDataBase();
+            clinicDataBase.setMobileNumber(clinic.getMobileNumber());
+            clinicDataBase.setRequestsPerDay(clinic.getRequestsPerDay());
+            clinicDataBase.setPrice(clinic.getPrice());
+            clinicDataBase.setAddress(clinic.getAddress());
+            clinicDataBase.setAddressAR(clinic.getAddressAR());
+            clinicDataBase.setAreaID(clinic.getAreaID());
+            clinicDataBase.setAreaName(clinic.getAreaName());
+            clinicDataBase.setCityID(clinic.getCityID());
+            clinicDataBase.setCityName(clinic.getCityName());
+            clinicDataBase.setClinicID(clinic.getClinicID());
+            clinicDataBase.setClinicName(clinic.getClinicName());
+            clinicDataBase.setClinicNameAR(clinic.getClinicNameAR());
+            clinicDataBase.setDiscount(clinic.getDiscount());
+            clinicDataBase.setAreaID(clinic.getAreaID());
+            clinicDataBase.setAreaName(clinic.getAreaName());
+            clinicDataBase.setEditable(clinic.getEditable());
+            clinicDataBase.setLandLine(clinic.getLandLine());
+            clinicDataBase.setRequestId(clinicID);
+            clinicDataBase.save();
+        }
+
+    }
+
     private void save() {
         if (!validate())
             return;
@@ -238,11 +316,17 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
         if (isCreate){
             clinic.setClinicID(0);
             clinics.add(clinic);
-            UpdateDoctorClinicsRequestBody clinicsRequestBody = new UpdateDoctorClinicsRequestBody();
-            clinicsRequestBody.setDoctor_ID((int) doctorID);
-            clinicsRequestBody.setLang(Locale.getDefault().getDisplayLanguage());
-            clinicsRequestBody.setAllClinics(clinics);
-            updateClinic(clinicsRequestBody);
+            if (isOnline) {
+                UpdateDoctorClinicsRequestBody clinicsRequestBody = new UpdateDoctorClinicsRequestBody();
+                clinicsRequestBody.setDoctor_ID((int) doctorID);
+                clinicsRequestBody.setLang(Locale.getDefault().getDisplayLanguage());
+                clinicsRequestBody.setAllClinics(clinics);
+                updateClinic(clinicsRequestBody);
+            }else{
+                saveInDB(clinics);
+                progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(this,R.string.request_saved, Toast.LENGTH_SHORT).show();
+            }
         }else {
 
             UpdateDoctorClinicsRequestBody clinicsRequestBody = new UpdateDoctorClinicsRequestBody();
@@ -409,6 +493,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
                         if (response.body().getCities() != null) {
                             cities.clear();
                             cities.addAll(response.body().getCities());
+                            saveCitiesInDB(response.body().getCities());
                             if (citiesArrayAdapter != null) {
                                 citiesArrayAdapter.notifyDataSetChanged();
                             }
@@ -449,6 +534,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
                         if (response.body().getAreas() != null) {
                             areas.clear();
                             areas.addAll(response.body().getAreas());
+                            saveAreasInDB(response.body().getAreas());
                             if (areasArrayAdapter != null) {
                                 areasArrayAdapter.notifyDataSetChanged();
                             }
@@ -508,6 +594,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
                     progressBar.setVisibility(View.GONE);
                     if (isCreate){
                         Toast.makeText(EditClinicActivity.this, R.string.clinic_added, Toast.LENGTH_SHORT).show();
+                        finish();
                     }else
                     {
                         Toast.makeText(EditClinicActivity.this, R.string.clinic_updated, Toast.LENGTH_SHORT).show();
@@ -542,6 +629,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
                     if (response.body().isSuccess()) {
                         if (progressBar.getVisibility() == View.VISIBLE) {
                             progressBar.setVisibility(View.GONE);
+                            finish();
                         }
 
                     } else {

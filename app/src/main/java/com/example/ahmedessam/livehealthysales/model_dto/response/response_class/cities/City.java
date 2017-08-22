@@ -1,15 +1,32 @@
 package com.example.ahmedessam.livehealthysales.model_dto.response.response_class.cities;
 
+import com.example.ahmedessam.livehealthysales.database.AppDataBase;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.Areas.Area;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.raizlabs.android.dbflow.structure.BaseModel;
+
+import java.util.List;
 import java.util.Locale;
 
 /**
  * Created by ahmed essam on 13/08/2017.
  */
-
-public class City {
+@Table(database = AppDataBase.class)
+public class City extends BaseModel{
+    @Column
     private String Name;
+    @Column
     private String Name_AR;
+    @Column
     private int ID;
+
+    public static void clearCitiesDB(){
+        List<City> movieList = SQLite.select().from(City.class).queryList();
+        FlowManager.getModelAdapter(City.class).deleteAll(movieList);
+    }
 
     public String getName() {
         return Name;

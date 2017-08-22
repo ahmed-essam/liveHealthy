@@ -1,8 +1,9 @@
-package com.example.ahmedessam.livehealthysales.model_dto.response.response_class.Areas;
+package com.example.ahmedessam.livehealthysales.database;
 
-import com.example.ahmedessam.livehealthysales.database.AppDataBase;
-import com.example.ahmedessam.livehealthysales.database.CreateClinicDB;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.Areas.Area;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.cities.City;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ForeignKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -12,16 +13,19 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by ahmed essam on 13/08/2017.
+ * Created by ahmed essam on 21/08/2017.
  */
 @Table(database = AppDataBase.class)
-public class Area extends BaseModel {
+public class AreaDataBase extends BaseModel {
     @Column
     private String Name;
     @Column
     private String Name_AR;
     @Column
     private int ID;
+    @ForeignKey(tableClass = City.class)
+    private int CityId;
+
     public static void clearAreasDB(){
         List<Area> movieList = SQLite.select().from(Area.class).queryList();
         FlowManager.getModelAdapter(Area.class).deleteAll(movieList);
@@ -51,6 +55,14 @@ public class Area extends BaseModel {
         this.ID = ID;
     }
 
+    public int getCityId() {
+        return CityId;
+    }
+
+    public void setCityId(int cityId) {
+        CityId = cityId;
+    }
+
     @Override
     public String toString() {
         if (Locale.getDefault().getDisplayLanguage() == "english") {
@@ -58,4 +70,5 @@ public class Area extends BaseModel {
         }else
             return getName_AR();
     }
+
 }

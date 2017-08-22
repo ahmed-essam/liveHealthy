@@ -2,10 +2,12 @@ package com.example.ahmedessam.livehealthysales.database;
 
 import com.google.gson.annotations.SerializedName;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.OneToMany;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import java.util.List;
@@ -53,6 +55,19 @@ public class CreateDoctorDB extends BaseModel{
     private String workAuthNo;
     @Column
     private String lang;
+
+    List<ClinicDataBase> clinicDataBaseList;
+
+    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "clinicDataBaseList")
+    public List<ClinicDataBase> getVideos() {
+        if (clinicDataBaseList == null || clinicDataBaseList.isEmpty()) {
+            clinicDataBaseList = new Select()
+                    .from(ClinicDataBase.class)
+                    .where(ClinicDataBase_Table.requestId_clinicID.eq((int) id))
+                    .queryList();
+        }
+        return clinicDataBaseList;
+    }
 
     public static void ClearCreateDoctorDB(){
         List<CreateDoctorDB> movieList = SQLite.select().from(CreateDoctorDB.class).queryList();

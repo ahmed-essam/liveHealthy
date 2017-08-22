@@ -32,8 +32,9 @@ public class ClinicsAdapter extends RecyclerView.Adapter<ClinicsAdapter.BaseClin
     private boolean isEnglish, showNamesOnly;
     private onClinicSelectedListener listener;
     int doctorId;
+    boolean online;
 
-    public ClinicsAdapter(ArrayList<Clinic> clinics, boolean showNamesOnly,int doctorId) {
+    public ClinicsAdapter(ArrayList<Clinic> clinics, boolean showNamesOnly,int doctorId , boolean online) {
         this.clinics = clinics;
         if (Locale.getDefault().getDisplayLanguage()=="English"){
             isEnglish = true;
@@ -105,7 +106,7 @@ public class ClinicsAdapter extends RecyclerView.Adapter<ClinicsAdapter.BaseClin
         @OnClick(R.id.editButton)
         void onEditClick() {
 //            EditClinicActivity.start(itemView.getContext(), clinics, getLayoutPosition());
-            EditClinicActivity.start(itemView.getContext(),clinics,getLayoutPosition(),(long)doctorId , false);
+            EditClinicActivity.start(itemView.getContext(),clinics,getLayoutPosition(),(long)doctorId , false,online);
         }
     }
 

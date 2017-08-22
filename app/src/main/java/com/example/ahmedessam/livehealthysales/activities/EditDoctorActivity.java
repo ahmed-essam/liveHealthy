@@ -2,6 +2,7 @@ package com.example.ahmedessam.livehealthysales.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.PersistableBundle;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -47,6 +49,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class EditDoctorActivity extends AppCompatActivity {
     private static final String ARG_Detail = "doctor_detail";
+    private static final String Detail = "Doctor_detail";
     private static final String TAG = "add_doctor_activity";
     @BindView(R.id.doctor_name_edit)
     EditText doctorNameEditText;
@@ -57,7 +60,7 @@ public class EditDoctorActivity extends AppCompatActivity {
     @BindView(R.id.speciality_spinner)
     EditText specialitySpinner;
     @BindView(R.id.save_icon)
-    ImageView saveIcon;
+    ImageButton saveIcon;
     @BindView(R.id.add_doctor_toolbar)
     Toolbar toolbar;
     @BindView(R.id.arabic_description)
@@ -92,8 +95,10 @@ public class EditDoctorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_doctor);
-
         ButterKnife.bind(this);
+        if (savedInstanceState!=null){
+            doctorDetail = (DoctorDetail) savedInstanceState.getSerializable(Detail);
+        }
         if (Connectivity.isConnected(this)){
             internetConnection = true;
         }else{
@@ -108,7 +113,9 @@ public class EditDoctorActivity extends AppCompatActivity {
             doctorDetail = getDoctorDetail();
             addViewValues(doctorDetail);
             getSpecialities();
-            specialtyID = doctorDetail.getSpecialityID();
+            if (doctorDetail.getSpecialityID()!=null) {
+                specialtyID = doctorDetail.getSpecialityID();
+            }
         }
     }
     public DoctorDetail getDoctorDetail() {
@@ -117,13 +124,27 @@ public class EditDoctorActivity extends AppCompatActivity {
         return doctorDetail;
     }
     public void addViewValues(DoctorDetail doctorDetail) {
-        doctorNameEditText.setText(doctorDetail.getName());
-        doctorNameAREditText.setText(doctorDetail.getNameAR());
-        pphoneEditText.setText(doctorDetail.getMobileNumber());
-        arabicDescription.setText(doctorDetail.getDescriptionAR());
-        englishDescription.setText(doctorDetail.getDescription());
-        specialitySpinner.setText(doctorDetail.getSpeciality());
-        emailEditText.setText(doctorDetail.getEmail().toString());
+        if (doctorDetail.getName()!=null) {
+            doctorNameEditText.setText(doctorDetail.getName());
+        }
+        if (doctorDetail.getNameAR()!=null) {
+            doctorNameAREditText.setText(doctorDetail.getNameAR());
+        }
+        if (doctorDetail.getMobileNumber()!=null) {
+            pphoneEditText.setText(doctorDetail.getMobileNumber());
+        }
+        if (doctorDetail.getDescriptionAR()!=null) {
+            arabicDescription.setText(doctorDetail.getDescriptionAR());
+        }
+        if (doctorDetail.getDescription()!=null) {
+            englishDescription.setText(doctorDetail.getDescription());
+        }
+        if (doctorDetail.getSpeciality()!=null) {
+            specialitySpinner.setText(doctorDetail.getSpeciality());
+        }
+        if (doctorDetail.getEmail()!=null) {
+            emailEditText.setText(doctorDetail.getEmail().toString());
+        }
     }
 
     public void saveUpdateInDB(UpdateDoctorRequest updateDoctorRequest){
@@ -164,9 +185,7 @@ public class EditDoctorActivity extends AppCompatActivity {
             nestedScroll.fullScroll(View.FOCUS_UP);
             saveIcon.setEnabled(false);
             progress.setVisibility(View.VISIBLE);
-
             updateDoctor();
-
         }else{
             Toast.makeText(this,R.string.empty_feild, Toast.LENGTH_SHORT).show();
         }
@@ -174,7 +193,7 @@ public class EditDoctorActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_clinics)
     public void EditClinic() {
-        Intent intent = ClinicsActivity.newClinics(this, doctorDetail.getDoctorID());
+        Intent intent = ClinicsActivity.newClinics(this, doctorDetail.getDoctorID(),true);
         startActivity(intent);
     }
 
@@ -359,6 +378,12 @@ public class EditDoctorActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(Detail,doctorDetail);
     }
 
     @Override

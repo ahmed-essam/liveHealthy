@@ -72,4 +72,14 @@
         <string name="description_in_english">نبذه باللغه الانجليزيه</string>
         <string name="description_in_arabic">نبذه باللغه العربيه</string>
         <string name="no_location">لا يوجد موقع محدد</string>
+        <string name="social_media">التواصل الاجتماعي</string>
+        <string name="there_is_no_clinics">لا يوجد عيادات</string>
+        <string name="no_schedule">لا يوجد مواعيد</string>
+        <string name="add_clinic">اضافه عياده</string>
+        <string name="request_saved">تم الحفظ</string>
+        <string name="start">موقوف</string>
+        <string name="clinic_added">تمت اضافه عياده</string>
+        <string name="clinic_updated">تم تعديل العياده</string>
+        <string name="edit_doctor">تعديل</string>
+        <string name="clinics">عيادات</string>
 </resources>

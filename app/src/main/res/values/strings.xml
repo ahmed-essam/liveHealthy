@@ -80,4 +80,7 @@
     <string name="clinic_added">clinic added</string>
     <string name="clinic_updated">clinic updated</string>
     <string name="edit_doctor">edit doctor</string>
+    <string name="clinics">clinics</string>
+    <string name="save_and_add_clinic">save and add clinic</string>
+    <string name="save_only">save only</string>
 </resources>

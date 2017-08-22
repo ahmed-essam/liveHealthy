@@ -13,6 +13,7 @@ import com.example.ahmedessam.livehealthysales.model_dto.response.response_class
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.LoginResponce;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.cities.CitiesGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.clinic.ClinicGeneralResponse;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.createDoctor.CreateDoctorResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.delete.DeleteDoctorGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.schedule.DaysGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.speciality.SpecialityGeneralResponse;
@@ -61,7 +62,7 @@ public interface NetworkMethods {
     Call<UpdateDoctorResponse> updateDoctor(@Body UpdateDoctorRequest updateDoctorRequest);
 
     @POST("Doctors/DoCreateDoctorRequest")
-    Call<UpdateDoctorResponse> createNewDoctor(@Body CreateDoctorRequest createDoctorRequest);
+    Call<CreateDoctorResponse> createNewDoctor(@Body CreateDoctorRequest createDoctorRequest);
 
     @POST("Doctors/DoUpdateDoctorClinics")
     Call<UpdateDoctorResponse> updateClinic(@Body UpdateDoctorClinicsRequestBody updateClinicRequest);

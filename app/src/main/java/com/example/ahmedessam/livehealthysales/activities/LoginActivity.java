@@ -39,7 +39,6 @@ public class LoginActivity extends AppCompatActivity {
     EditText passwordEditText;
     @BindView(R.id.login_progress_bar)
     ProgressBar progressBar;
-
     private String TAG = LoginActivity.class.getSimpleName();
     private String language;
 

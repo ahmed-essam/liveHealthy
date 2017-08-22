@@ -26,7 +26,7 @@
             android:layout_gravity="center"
             />
 
-        <ImageView
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -34,6 +34,7 @@
             android:layout_marginRight="8dp"
             android:src="@drawable/checked"
             android:id="@+id/save_icon"
+            android:background="@android:color/transparent"
             />
 
 
@@ -191,7 +192,6 @@
                 android:elevation="4dp"
                 android:inputType="text"
                 android:selectAllOnFocus="true"
-                android:nextFocusForward="@+id/tittle"
                 />
 
             <Button

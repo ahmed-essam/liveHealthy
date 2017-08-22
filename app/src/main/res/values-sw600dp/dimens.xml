@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="header_height">290dp</dimen>
+    <dimen name="circle_text_view">25dp</dimen>
+    <dimen name="serch_margin">60dp</dimen>
+    <dimen name="fab_margin">46dp</dimen>
+    <dimen name="padding">10dp</dimen>
+    <dimen name="doctor_detail_header">320dp</dimen>
+    <dimen name="image_dimens">100dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+
+</resources>

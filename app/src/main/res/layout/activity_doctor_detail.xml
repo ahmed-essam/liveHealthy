@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -17,17 +18,13 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="@dimen/doctor_detail_header"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleGravity="top|center"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:titleEnabled="false">
 
-            <FrameLayout
-                android:id="@+id/main.framelayout.title"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom">
+
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/detail_toolbar"
@@ -35,7 +32,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|center"
                     android:gravity="center"
-                    app:layout_scrollFlags="scroll|enterAlways">
+                    app:layout_collapseMode="pin">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -49,12 +46,12 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/detail_doctor_image"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="@dimen/image_dimens"
+                    android:layout_height="@dimen/image_dimens"
                     android:layout_gravity="start|center_vertical"
                     android:layout_marginBottom="20dp"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginStart="30dp"
+                    android:layout_marginLeft="@dimen/serch_margin"
+                    android:layout_marginStart="@dimen/serch_margin"
                     android:layout_marginTop="8dp"
                     android:src="@drawable/background"
 
@@ -64,7 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:layout_marginBottom="25dp"
+                    android:layout_marginBottom="@dimen/fab_margin"
                     android:layout_marginEnd="10dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
@@ -95,7 +92,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
                             android:drawableLeft="@drawable/detail_mail"
-                            android:drawablePadding="3dp"
+                            android:drawablePadding="@dimen/margin_small"
                             android:drawableStart="@drawable/detail_mail"
                             android:maxLines="1"
                             android:textColor="@color/colorAccent"
@@ -107,10 +104,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
-                        android:layout_marginEnd="3dp"
-                        android:layout_marginLeft="4dp"
+                        android:layout_marginEnd="@dimen/margin_small"
+                        android:layout_marginLeft="@dimen/margin_small"
                         android:layout_marginRight="3dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="@dimen/margin_small"
                         android:layout_toLeftOf="@+id/stop_button"
                         android:layout_toStartOf="@+id/stop_button"
                         android:background="@drawable/button_with_border"
@@ -125,17 +122,16 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentRight="true"
                         android:layout_gravity="top"
-                        android:layout_marginEnd="2dp"
+                        android:layout_marginEnd="@dimen/margin_small"
                         android:layout_marginLeft="2dp"
-                        android:layout_marginRight="2dp"
-                        android:layout_marginStart="2dp"
+                        android:layout_marginRight="@dimen/margin_small"
+                        android:layout_marginStart="@dimen/margin_small"
                         android:background="@drawable/button_with_border"
                         android:text="@string/stop"
                         android:textColor="@color/colorAccent"
                         android:textSize="16sp" />
 
                 </LinearLayout>
-            </FrameLayout>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
@@ -174,8 +170,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginLeft="@dimen/padding"
+                    android:layout_marginStart="@dimen/padding"
                     android:layout_marginTop="10dp"
                     android:drawableLeft="@drawable/id"
                     android:drawablePadding="4dp"
@@ -189,8 +185,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginLeft="@dimen/padding"
+                    android:layout_marginStart="@dimen/padding"
                     android:layout_marginTop="6dp"
                     android:drawableLeft="@drawable/location"
                     android:drawablePadding="4dp"
@@ -205,8 +201,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginLeft="@dimen/padding"
+                    android:layout_marginStart="@dimen/padding"
                     android:layout_marginTop="6dp"
                     android:drawableLeft="@drawable/phone"
                     android:drawablePadding="4dp"

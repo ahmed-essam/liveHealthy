@@ -15,26 +15,34 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.ahmedessam.livehealthysales.R;
 import com.example.ahmedessam.livehealthysales.adapters.DoctorsAdapter;
+import com.example.ahmedessam.livehealthysales.database.ClinicDataBase;
+import com.example.ahmedessam.livehealthysales.database.ClinicDataBase_Table;
+import com.example.ahmedessam.livehealthysales.database.CreateClinicDB;
+import com.example.ahmedessam.livehealthysales.database.CreateClinicDB_Table;
 import com.example.ahmedessam.livehealthysales.database.CreateDoctorDB;
 import com.example.ahmedessam.livehealthysales.database.UpdateDoctorDb;
 import com.example.ahmedessam.livehealthysales.model_dto.request.CreateDoctorRequest;
 import com.example.ahmedessam.livehealthysales.model_dto.request.DoctorsRequest;
+import com.example.ahmedessam.livehealthysales.model_dto.request.UpdateDoctorClinicsRequestBody;
 import com.example.ahmedessam.livehealthysales.model_dto.request.UpdateDoctorRequest;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.AllDoctorsResponse;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.createDoctor.CreateDoctorResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.updateDoctor.UpdateDoctorResponse;
+import com.example.ahmedessam.livehealthysales.models.Clinic;
 import com.example.ahmedessam.livehealthysales.models.Doctor;
 import com.example.ahmedessam.livehealthysales.network.NetworkProvider;
 import com.example.ahmedessam.livehealthysales.util.Connectivity;
 import com.example.ahmedessam.livehealthysales.util.EndlessRecyclerViewScrollListener;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -53,7 +61,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     @BindView(R.id.doctors_recycler_view)
     RecyclerView doctorRecyclerView;
     @BindView(R.id.refresh_icon)
-    ImageView refreshIcon;
+    ImageButton refreshIcon;
     @BindView(R.id.search_edit_text)
     EditText searchEditText;
     @BindView(R.id.add_floating_button)
@@ -70,10 +78,11 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     DoctorsAdapter doctorsAdapter;
     Call<AllDoctorsResponse> responceCall;
     Call<UpdateDoctorResponse> updateDoctorResponseCall;
-    Call<UpdateDoctorResponse> createDoctorResponse;
+    Call<CreateDoctorResponse> createDoctorResponse;
+    Call<UpdateDoctorResponse> updateClinicResponseCall;
+    Animation rotateAboutCenterAnimation;
     private EndlessRecyclerViewScrollListener scrollListener;
     private int pageNum;
-    Animation rotateAboutCenterAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,10 +99,16 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
         } else {
             unSaveCount.setVisibility(View.GONE);
         }
-          rotateAboutCenterAnimation = AnimationUtils.loadAnimation(this,R.anim.loade_animation);
+        rotateAboutCenterAnimation = AnimationUtils.loadAnimation(this, R.anim.loade_animation);
         rotateAboutCenterAnimation.setRepeatCount(Animation.INFINITE);
+        if (!Connectivity.isConnected(this)) {
+            noDataText.setVisibility(View.VISIBLE);
+            noDataText.setText(R.string.network_error);
+            mSwipeRefreshLayout.setRefreshing(false);
 
-
+        } else {
+            noDataText.setVisibility(View.GONE);
+        }
         fetchDoctors("");
         setSupportActionBar(doctorsToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -118,14 +133,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
             }
         };
-        if (!Connectivity.isConnected(this)){
-            noDataText.setVisibility(View.VISIBLE);
-            noDataText.setText(R.string.network_error);
-            mSwipeRefreshLayout.setRefreshing(false);
 
-        }else{
-            noDataText.setVisibility(View.GONE);
-        }
         doctorRecyclerView.setLayoutManager(linearLayout);
         doctorsAdapter = new DoctorsAdapter(this);
         doctorRecyclerView.setAdapter(doctorsAdapter);
@@ -175,7 +183,8 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
     @OnClick(R.id.refresh_icon)
     public void refreshRequests() {
-//        refreshIcon.startAnimation(rotateAboutCenterAnimation);
+        Toast.makeText(this, "please waite untill save", Toast.LENGTH_SHORT).show();
+        refreshIcon.startAnimation(rotateAboutCenterAnimation);
         if (Connectivity.isConnected(this)) {
             if (getRequestsNum() > 0) {
                 List<CreateDoctorDB> createDoctorDBList = SQLite.select().from(CreateDoctorDB.class).queryList();
@@ -184,7 +193,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                     for (int i = 0; i < createDoctorDBList.size(); i++) {
                         CreateDoctorDB createDoctorDB = createDoctorDBList.get(i);
                         CreateDoctorRequest createDoctorRequest = createDoctorRequest(createDoctorDB);
-                        createDoctor(createDoctorRequest,createDoctorDB);
+                        createDoctor(createDoctorRequest, createDoctorDB);
 //                        if (isSuccess){
 //                           createDoctorDB.delete();
 //
@@ -192,25 +201,29 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 //                        }
                     }
                 }
-                if (updateDoctorDbList.size()>0){
+                if (updateDoctorDbList.size() > 0) {
                     for (int i = 0; i < updateDoctorDbList.size(); i++) {
                         UpdateDoctorDb updateDoctorDb = updateDoctorDbList.get(i);
                         UpdateDoctorRequest updateDoctorRequest = getUpdateDoctorRequest(updateDoctorDb);
-                        updateDoctor(updateDoctorRequest,updateDoctorDb);
+                        updateDoctor(updateDoctorRequest, updateDoctorDb);
 //                        if (isSuccess){
 //                            updateDoctorDb.delete();
 //                            unSaveCount.setText(""+(Integer.parseInt(unSaveCount.getText().toString())-1));
 //                        }
                     }
                 }
+                rotateAboutCenterAnimation.reset();
+                rotateAboutCenterAnimation.cancel();
 
-                if (getRequestsNum()>0){
+                if (getRequestsNum() > 0) {
                     unSaveCount.setVisibility(View.VISIBLE);
-                    unSaveCount.setText(""+getRequestsNum());
-                }else{
+                    unSaveCount.setText("" + getRequestsNum());
+                } else {
                     unSaveCount.setVisibility(View.GONE);
+                    rotateAboutCenterAnimation.reset();
+                    rotateAboutCenterAnimation.cancel();
                 }
-            }else{
+            } else {
                 unSaveCount.setVisibility(View.GONE);
                 Toast.makeText(this, R.string.no_data, Toast.LENGTH_SHORT).show();
             }
@@ -232,14 +245,14 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                         if (response.body().isSuccess()) {
                             if (response.body().getDoctorsResponse().getDoctors() != null) {
                                 List<Doctor> doctorList = response.body().getDoctorsResponse().getDoctors();
-                                if (doctorList.size() >0) {
+                                if (doctorList.size() > 0) {
                                     noDataText.setVisibility(View.GONE);
                                     if (pageNum == 1) {
                                         doctorsAdapter.addAll(doctorList);
                                     } else {
                                         doctorsAdapter.addItems(doctorList);
                                     }
-                                }else{
+                                } else {
                                     noDataText.setText(R.string.no_data);
                                     noDataText.setVisibility(View.VISIBLE);
                                 }
@@ -307,7 +320,52 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
         return createDoctorRequest;
     }
 
-    public void updateDoctor(UpdateDoctorRequest updateDoctorRequest , final UpdateDoctorDb updateDoctorDb) {
+    public List<Clinic> getClinicsFromClinicsDB(List<ClinicDataBase> clinicDataBaseList) {
+        List<Clinic> clinics = new ArrayList<>();
+        for (int i = 0; i < clinicDataBaseList.size(); i++) {
+            Clinic clinic = new Clinic();
+            ClinicDataBase clinicDataBase = clinicDataBaseList.get(i);
+            clinic.setClinicID(0);
+            clinic.setAddress(clinicDataBase.getAddress());
+            clinic.setAddressAR(clinicDataBase.getAddressAR());
+            clinic.setAreaID(clinicDataBase.getAreaID());
+            clinic.setAreaName(clinicDataBase.getAreaName());
+            clinic.setCityID(clinicDataBase.getCityID());
+            clinic.setCityName(clinicDataBase.getCityName());
+            clinic.setClinicName(clinicDataBase.getClinicName());
+            clinic.setClinicNameAR(clinicDataBase.getClinicNameAR());
+            clinic.setDiscount(clinicDataBase.getDiscount());
+            clinic.setLandLine(clinicDataBase.getLandLine());
+            clinic.setEditable(clinicDataBase.getEditable());
+            clinic.setMobileNumber(clinicDataBase.getMobileNumber());
+            clinic.setPrice(clinicDataBase.getPrice());
+            clinic.setRequestsPerDay(clinicDataBase.getRequestsPerDay());
+            clinics.add(clinic);
+        }
+        return clinics;
+    }
+
+    public List<ClinicDataBase> getClinicsFromDb(long doctorId, List<CreateClinicDB> createClinicDBs) {
+        List<CreateClinicDB> createClinicDBList = createClinicDBs;
+
+        List<ClinicDataBase> clinicDataBaseList = new ArrayList<>();
+        for (int i = 0; i < createClinicDBList.size(); i++) {
+            List<ClinicDataBase> clinicDataBases = SQLite.select().from(ClinicDataBase.class)
+                    .where(ClinicDataBase_Table.requestId_clinicID.eq(createClinicDBList.get(i).getClinicID())).queryList();
+            clinicDataBaseList.addAll(clinicDataBases);
+        }
+        return clinicDataBaseList;
+    }
+
+    public UpdateDoctorClinicsRequestBody createClinicRequest(List<Clinic> clinics, long doctorId) {
+        UpdateDoctorClinicsRequestBody clinicsRequestBody = new UpdateDoctorClinicsRequestBody();
+        clinicsRequestBody.setDoctor_ID((int) doctorId);
+        clinicsRequestBody.setLang(Locale.getDefault().getDisplayLanguage());
+        clinicsRequestBody.setAllClinics(clinics);
+        return clinicsRequestBody;
+    }
+
+    public void updateDoctor(UpdateDoctorRequest updateDoctorRequest, final UpdateDoctorDb updateDoctorDb) {
         updateDoctorResponseCall = NetworkProvider.provideNetworkMethods(this).updateDoctor(updateDoctorRequest);
         updateDoctorResponseCall.enqueue(new Callback<UpdateDoctorResponse>() {
             @Override
@@ -315,9 +373,9 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                 if (response.isSuccessful()) {
                     if (response.body().isSuccess()) {
                         isSuccess = true;
-                        Toast.makeText(DoctorsActivity.this, R.string.doctor_updated, Toast.LENGTH_SHORT).show();
-                        if (updateDoctorDb.delete()){
-                            unSaveCount.setText(""+getRequestsNum());
+
+                        if (updateDoctorDb.delete()) {
+                            unSaveCount.setText("" + getRequestsNum());
                         }
                     } else {
                         isSuccess = false;
@@ -325,7 +383,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
                     }
                 } else {
-                    isSuccess=false;
+                    isSuccess = false;
                     Toast.makeText(DoctorsActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
 
                 }
@@ -333,24 +391,36 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
             @Override
             public void onFailure(Call<UpdateDoctorResponse> call, Throwable t) {
-                isSuccess=false;
+                isSuccess = false;
                 Toast.makeText(DoctorsActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
-    public void createDoctor(CreateDoctorRequest createDoctorRequest , final CreateDoctorDB createDoctorDB) {
+    public void createDoctor(CreateDoctorRequest createDoctorRequest, final CreateDoctorDB createDoctorDB) {
         createDoctorResponse = NetworkProvider.provideNetworkMethods(this).createNewDoctor(createDoctorRequest);
-        createDoctorResponse.enqueue(new Callback<UpdateDoctorResponse>() {
+        createDoctorResponse.enqueue(new Callback<CreateDoctorResponse>() {
             @Override
-            public void onResponse(Call<UpdateDoctorResponse> call, Response<UpdateDoctorResponse> response) {
+            public void onResponse(Call<CreateDoctorResponse> call, Response<CreateDoctorResponse> response) {
                 if (response.isSuccessful()) {
                     if (response.body().isSuccess()) {
                         isSuccess = true;
                         Toast.makeText(DoctorsActivity.this, R.string.doctor_added, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DoctorsActivity.this, R.string.doctor_updated, Toast.LENGTH_SHORT).show();
+                        List<CreateClinicDB> createClinicDBList = SQLite.select().from(CreateClinicDB.class)
+                                .where(CreateClinicDB_Table.Doctor_ID_id.eq(createDoctorDB.getId())).queryList();
+                        if (createClinicDBList != null && createClinicDBList.size() > 0) {
+                            List<ClinicDataBase> clinicDataBases = getClinicsFromDb(createDoctorDB.getId(), createClinicDBList);
+                            List<Clinic> clinics = getClinicsFromClinicsDB(clinicDataBases);
+                            if (clinics != null && clinics.size() > 0) {
+                                UpdateDoctorClinicsRequestBody updateDoctorClinicsRequestBody = createClinicRequest(clinics, response.body().getDoctorIdResponse().getDoctorID());
+                                updateClinic(updateDoctorClinicsRequestBody, clinicDataBases, createClinicDBList, createDoctorDB);
+                            }
+                        }else {
                         if(createDoctorDB.delete()){
                            unSaveCount.setText(""+getRequestsNum());
+                        }
                         }
                     } else {
                         isSuccess = false;
@@ -366,13 +436,69 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
 
             @Override
-            public void onFailure(Call<UpdateDoctorResponse> call, Throwable t) {
-                Log.e(TAG, "onFailure: "+t.getMessage());
-                isSuccess=false;
+            public void onFailure(Call<CreateDoctorResponse> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
+                isSuccess = false;
                 Toast.makeText(DoctorsActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
             }
         });
 
+    }
+
+    public Boolean verifyUpdateClinicResponse(Response<UpdateDoctorResponse> response) {
+        if (response.isSuccessful()) {
+            if (response.body().isSuccess()) {
+                return true;
+
+            } else {
+                Toast.makeText(this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "verifyUpdateClinicResponse: " + response.body().getErrorMessage());
+
+                return false;
+
+            }
+        } else {
+            Toast.makeText(this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "verifyUpdateClinicResponse: " + response.body().getErrorMessage());
+
+            return false;
+        }
+    }
+
+    public void updateClinic(final UpdateDoctorClinicsRequestBody updateClinicsRequest, final List<ClinicDataBase> clincs, final List<CreateClinicDB> createClinicDBList, final CreateDoctorDB createDoctorDB) {
+        updateClinicResponseCall = NetworkProvider.provideNetworkMethods(this).updateClinic(updateClinicsRequest);
+        updateClinicResponseCall.enqueue(new Callback<UpdateDoctorResponse>() {
+            @Override
+            public void onResponse(Call<UpdateDoctorResponse> call, Response<UpdateDoctorResponse> response) {
+                if (verifyUpdateClinicResponse(response)) {
+                    List<ClinicDataBase> clinicDataBaseList = clincs;
+                    for (int i = 0; i < clinicDataBaseList.size(); i++) {
+                        ClinicDataBase clinicDataBase = clinicDataBaseList.get(i);
+                        if (clinicDataBase.delete()) {
+                            Log.d(TAG, "onResponse: " + "ok" + i);
+                        }
+                    }
+                    for (int i = 0; i < createClinicDBList.size(); i++) {
+                        CreateClinicDB createClinicDB = createClinicDBList.get(i);
+                        if (createClinicDB.delete()) {
+                            Log.d(TAG, "onResponse:createClinic " + "ok" + i);
+                        }
+                    }
+                    if (createDoctorDB.delete()) {
+                        unSaveCount.setText("" + getRequestsNum());
+                    }
+
+                } else {
+                    Log.e(TAG, "onResponse: " + response.body().getErrorMessage());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<UpdateDoctorResponse> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override
@@ -399,22 +525,22 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     protected void onRestart() {
         fetchDoctors(searchEditText.getText().toString());
         mSwipeRefreshLayout.setRefreshing(true);
-        if (getRequestsNum()>0){
+        if (getRequestsNum() > 0) {
             unSaveCount.setVisibility(View.VISIBLE);
-            unSaveCount.setText(""+getRequestsNum());
+            unSaveCount.setText("" + getRequestsNum());
         }
         super.onRestart();
     }
 
     @Override
     protected void onStop() {
-        if (responceCall!= null) {
+        if (responceCall != null) {
             responceCall.cancel();
         }
         if (updateDoctorResponseCall != null) {
             updateDoctorResponseCall.cancel();
         }
-        if (createDoctorResponse!= null) {
+        if (createDoctorResponse != null) {
             createDoctorResponse.cancel();
         }
         super.onStop();
