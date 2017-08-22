@@ -56,17 +56,17 @@ public class CreateDoctorDB extends BaseModel{
     @Column
     private String lang;
 
-    List<ClinicDataBase> clinicDataBaseList;
+    List<CreateClinicDB> createClinicDBList;
 
-    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "clinicDataBaseList")
-    public List<ClinicDataBase> getVideos() {
-        if (clinicDataBaseList == null || clinicDataBaseList.isEmpty()) {
-            clinicDataBaseList = new Select()
-                    .from(ClinicDataBase.class)
-                    .where(ClinicDataBase_Table.requestId_clinicID.eq((int) id))
+    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "createClinicDBList")
+    public List<CreateClinicDB> getCreateClinicDBList() {
+        if (createClinicDBList == null || createClinicDBList.isEmpty()) {
+            createClinicDBList = new Select()
+                    .from(CreateClinicDB.class)
+                    .where(CreateClinicDB_Table.doctor_id.eq(id))
                     .queryList();
         }
-        return clinicDataBaseList;
+        return createClinicDBList;
     }
 
     public static void ClearCreateDoctorDB(){

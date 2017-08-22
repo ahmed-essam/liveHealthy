@@ -32,6 +32,8 @@ import com.example.ahmedessam.livehealthysales.model_dto.response.response_class
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.Areas.AreaGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.cities.CitiesGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.cities.City;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.getAllAreas.AllArea;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.getAllAreas.AllArea_Table;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.schedule.DaysGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.updateDoctor.UpdateDoctorResponse;
 import com.example.ahmedessam.livehealthysales.models.Clinic;
@@ -195,7 +197,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
                 fetchAreas();
             }else{
                 fetchCitiesFromDB();
-                fetchAreasFromDB();
+                fetchAreasFromDB(cityID);
             }
         }
 
@@ -220,15 +222,26 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
             fetchAreas();
         }else{
             fetchCitiesFromDB();
-            fetchAreasFromDB();
+            fetchAreasFromDB(cityID);
         }
     }
 
     public void fetchCitiesFromDB(){
         cities = SQLite.select().from(City.class).queryList();
     }
-    public void fetchAreasFromDB(){
-        areas = SQLite.select().from(Area.class).queryList();
+    public void fetchAreasFromDB(int cityId){
+        List<AllArea> allAreas = SQLite.select().from(AllArea.class).where(AllArea_Table.City_ID.eq(cityId)).queryList();
+        List<Area> areaList = new ArrayList<>();
+        for (int i = 0; i<allAreas.size();i++){
+            AllArea allArea = allAreas.get(i);
+            Area area = new Area();
+            area.setID(allArea.getID());
+            area.setName(allArea.getName());
+            area.setName_AR(allArea.getName_AR());
+            areaList.add(area);
+        }
+        areas.clear();
+        areas.addAll(areaList);
     }
     public void saveCitiesInDB(List<City> cityList){
         City.clearCitiesDB();
@@ -237,13 +250,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
             city.save();
         }
     }
-    public void saveAreasInDB(List<Area> areaList){
-        Area.clearAreasDB();
-        for (int i =0 ; i<areaList.size();i++){
-            Area area = areaList.get(i);
-            area.save();
-        }
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -534,7 +541,6 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
                         if (response.body().getAreas() != null) {
                             areas.clear();
                             areas.addAll(response.body().getAreas());
-                            saveAreasInDB(response.body().getAreas());
                             if (areasArrayAdapter != null) {
                                 areasArrayAdapter.notifyDataSetChanged();
                             }

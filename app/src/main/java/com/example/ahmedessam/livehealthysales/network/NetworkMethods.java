@@ -15,6 +15,7 @@ import com.example.ahmedessam.livehealthysales.model_dto.response.response_class
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.clinic.ClinicGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.createDoctor.CreateDoctorResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.delete.DeleteDoctorGeneralResponse;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.getAllAreas.AllAreasResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.schedule.DaysGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.speciality.SpecialityGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.updateDoctor.UpdateDoctorResponse;
@@ -57,6 +58,9 @@ public interface NetworkMethods {
 
     @GET("Areas/GetAreas?")
     Call<AreaGeneralResponse> getAreas(@Query("City_ID") long CityId, @Query("PageNumber") int pagenum,@Query("NumberRecords") int packageNum );
+
+    @GET("Areas/GetAllAreas")
+    Call<AllAreasResponse> getAllAreas();
 
     @POST("Doctors/DoUpdateDoctorDetails")
     Call<UpdateDoctorResponse> updateDoctor(@Body UpdateDoctorRequest updateDoctorRequest);

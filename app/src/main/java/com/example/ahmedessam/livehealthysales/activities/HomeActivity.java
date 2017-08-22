@@ -13,6 +13,8 @@ import com.example.ahmedessam.livehealthysales.R;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.Areas.AreaGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.cities.CitiesGeneralResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.cities.City;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.getAllAreas.AllArea;
+import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.getAllAreas.AllAreasResponse;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.speciality.Speciality;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.speciality.SpecialityGeneralResponse;
 import com.example.ahmedessam.livehealthysales.network.NetworkProvider;
@@ -39,7 +41,7 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.pharmacy_text) TextView pharmacyText;
     Call<SpecialityGeneralResponse> specialityGeneralResponseCall;
     Call<CitiesGeneralResponse> citiesResponseCall;
-    Call<AreaGeneralResponse> areaResponseCall;
+    Call<AllAreasResponse> areaResponseCall;
 
 
     @Override
@@ -49,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         getSpecialities();
         fetchCities();
+        fetchAreas();
     }
     @OnClick(R.id.doctor_icon)
     public void doctorClicked(){
@@ -68,10 +71,20 @@ public class HomeActivity extends AppCompatActivity {
 
     public void saveCities(List<City> cityList  ){
         if (cityList != null && cityList.size()!=0){
-            Speciality.clearSpecialityDB();
+            City.clearCitiesDB();
             for (int i=0;i<cityList.size();i++){
                 City city = cityList.get(i);
                 city.save();
+            }
+        }
+    }
+
+    public void saveAreas(List<AllArea> areaList  ){
+        if ( areaList!= null && areaList.size()!=0){
+            AllArea.ClearAreasDB();
+            for (int i=0;i<areaList.size();i++){
+                AllArea allArea = areaList.get(i);
+                allArea.save();
             }
         }
     }
@@ -143,16 +156,15 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    public void fetchAreas(int cityID) {
-        areaResponseCall = NetworkProvider.provideNetworkMethods(this).getAreas(cityID, 1, 1000);
-        areaResponseCall.enqueue(new Callback<AreaGeneralResponse>() {
+    public void fetchAreas() {
+        areaResponseCall = NetworkProvider.provideNetworkMethods(this).getAllAreas();
+        areaResponseCall.enqueue(new Callback<AllAreasResponse>() {
             @Override
-            public void onResponse(Call<AreaGeneralResponse> call, Response<AreaGeneralResponse> response) {
+            public void onResponse(Call<AllAreasResponse> call, Response<AllAreasResponse> response) {
                 if (response.isSuccessful()) {
                     if (response.body().isSuccess()) {
-                        if (response.body().getAreas() != null) {
-
-
+                        if (response.body().getResponse().getAllAreas() != null) {
+                            saveAreas(response.body().getResponse().getAllAreas());
                         } else {
                             Toast.makeText(HomeActivity.this, R.string.no_data, Toast.LENGTH_SHORT).show();
 
@@ -169,7 +181,7 @@ public class HomeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<AreaGeneralResponse> call, Throwable t) {
+            public void onFailure(Call<AllAreasResponse> call, Throwable t) {
                 Toast.makeText(HomeActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
             }
         });

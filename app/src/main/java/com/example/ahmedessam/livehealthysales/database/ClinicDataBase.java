@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -49,9 +50,8 @@ public class ClinicDataBase extends BaseModel {
     private Boolean editable;
     @Column
     private Integer discount;
-    @Column
-    @ForeignKey
-    private CreateDoctorDB createDoctorDB;
+    @ForeignKey(tableClass = CreateClinicDB.class , references = @ForeignKeyReference(columnName = "request_id", foreignKeyColumnName = "clinicID"))
+    private long requestId;
 
     public static void ClearClinicDB(){
         List<ClinicDataBase> movieList = SQLite.select().from(ClinicDataBase.class).queryList();
@@ -66,12 +66,12 @@ public class ClinicDataBase extends BaseModel {
         this.id = id;
     }
 
-    public CreateDoctorDB getCreateDoctorDB() {
-        return createDoctorDB;
+    public long getRequestId() {
+        return requestId;
     }
 
-    public void setCreateDoctorDB(CreateDoctorDB createDoctorDB) {
-        this.createDoctorDB = createDoctorDB;
+    public void setRequestId(long requestId) {
+        this.requestId = requestId;
     }
 
     public Integer getClinicID() {
