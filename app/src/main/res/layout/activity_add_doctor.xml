@@ -399,16 +399,6 @@
             android:inputType="text"
             android:selectAllOnFocus="true"
             />
-        <Button
-            android:id="@+id/button_add_clinic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/mdtp_month_day_label_text_size"
-            android:layout_marginLeft="@dimen/mdtp_month_day_label_text_size"
-            android:background="@color/colorPrimary"
-            android:textColor="@color/colorAccent"
-            android:text="@string/save_and_add_clinic"
-            android:layout_marginTop="10dp"/>
 
 
     </LinearLayout>

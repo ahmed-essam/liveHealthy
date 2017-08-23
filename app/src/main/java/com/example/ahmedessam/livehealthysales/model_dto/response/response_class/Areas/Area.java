@@ -14,13 +14,9 @@ import java.util.Locale;
 /**
  * Created by ahmed essam on 13/08/2017.
  */
-@Table(database = AppDataBase.class)
 public class Area extends BaseModel {
-    @Column
     private String Name;
-    @Column
     private String Name_AR;
-    @Column
     private int ID;
     public static void clearAreasDB(){
         List<Area> movieList = SQLite.select().from(Area.class).queryList();

@@ -3,6 +3,7 @@ package com.example.ahmedessam.livehealthysales.activities;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -65,17 +66,19 @@ public class ClinicsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_clinics);
         clinics = new ArrayList<>();
         ButterKnife.bind(this);
+        if (savedInstanceState!=null){
+            isOnline = savedInstanceState.getBoolean(ARD_ONLINE);
+        }
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.clinics);
+        addClinic.setEnabled(false);
         doctorID = getDoctorId();
         adapter = new ClinicsAdapter(new ArrayList<Clinic>(), false ,doctorID,isOnline);
-        fetchClinics();
         clinicsRecycler.setAdapter(adapter);
         clinicsRecycler.setLayoutManager(new LinearLayoutManager(this));
         fetchClinics();
-        addClinic.setEnabled(false);
     }
 
     public static Intent newClinics(Context context,int doctor_id ,boolean online){
@@ -112,7 +115,6 @@ public class ClinicsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        progressBar.setVisibility(View.VISIBLE);
 
     }
 
@@ -159,7 +161,7 @@ public class ClinicsActivity extends AppCompatActivity {
             clinic.setClinicNameAR(clinicDataBase.getClinicNameAR());
             clinic.setDiscount(clinicDataBase.getDiscount());
             clinic.setLandLine(clinicDataBase.getLandLine());
-            clinic.setEditable(clinicDataBase.getEditable());
+            clinic.setEditable(clinicDataBase.isEditable());
             clinic.setMobileNumber(clinicDataBase.getMobileNumber());
             clinic.setPrice(clinicDataBase.getPrice());
             clinic.setRequestsPerDay(clinicDataBase.getRequestsPerDay());
@@ -168,11 +170,17 @@ public class ClinicsActivity extends AppCompatActivity {
     }
     public void fetchClinics() {
         if (!isOnline){
-            List<CreateClinicDB> createClinicDBs = SQLite.select().from(CreateClinicDB.class).where(CreateClinicDB_Table.Doctor_ID_id.eq((long) doctorID)).queryList();
-            List<ClinicDataBase> clinicDataBases =  SQLite.select().from(ClinicDataBase.class)
-                    .where(ClinicDataBase_Table.requestId_clinicID.eq(createClinicDBs.get(0).getClinicID()))
-                    .queryList();
-            getClinicsFromClinicRequest(clinicDataBases);
+            List<CreateClinicDB> createClinicDBs = SQLite.select().from(CreateClinicDB.class).where(CreateClinicDB_Table.doctor_id.eq((long) doctorID)).queryList();
+            if (createClinicDBs != null &&createClinicDBs.size()>0 ) {
+                List<ClinicDataBase> clinicDataBases = createClinicDBs.get(0).getClinicDataBaseList();
+                getClinicsFromClinicRequest(clinicDataBases);
+                adapter.setClinics(clinics);
+                addClinic.setEnabled(true);
+                progressBar.setVisibility(View.GONE);
+            }else{
+                progressBar.setVisibility(View.GONE);
+                addClinic.setEnabled(true);
+            }
             return;
         }
         clinicResponceCall = NetworkProvider.provideNetworkMethods(this).getClinics(doctorID, Locale.getDefault().getDisplayLanguage());
@@ -198,4 +206,9 @@ public class ClinicsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putBoolean(ARD_ONLINE,isOnline);
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
 }

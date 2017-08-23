@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -96,7 +97,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
     @BindView(R.id.addSchedule)
     ImageButton addScedule;
     @BindView(R.id.schedule_layout)
-    ImageButton scheduleLayout;
+    LinearLayout scheduleLayout;
 
     private ArrayList<Clinic> clinics;
     private int index;
@@ -277,7 +278,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
         createClinicDB.setLang(Locale.getDefault().getDisplayLanguage());
         createClinicDB.setDoctor_ID(doctorID);
         createClinicDB.save();
-        int clinicID = SQLite.select(CreateClinicDB_Table.clinicID).from(CreateClinicDB.class).where(CreateClinicDB_Table.Doctor_ID_id.eq(doctorID)).hashCode();
+        int clinicId= SQLite.select(CreateClinicDB_Table.clinicID).from(CreateClinicDB.class).where(CreateClinicDB_Table.doctor_id.eq(doctorID)).hashCode();
         for (int i = 0;i<clinics.size();i++) {
             Clinic clinic = clinics.get(i);
             ClinicDataBase clinicDataBase = new ClinicDataBase();
@@ -298,7 +299,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
             clinicDataBase.setAreaName(clinic.getAreaName());
             clinicDataBase.setEditable(clinic.getEditable());
             clinicDataBase.setLandLine(clinic.getLandLine());
-            clinicDataBase.setRequestId(clinicID);
+            clinicDataBase.setRequestId(clinicId);
             clinicDataBase.save();
         }
 
@@ -333,6 +334,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
                 saveInDB(clinics);
                 progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,R.string.request_saved, Toast.LENGTH_SHORT).show();
+                finish();
             }
         }else {
 
@@ -691,7 +693,11 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
 
     @OnTouch(R.id.area)
     public boolean selectArea(View v, MotionEvent event) {
-        fetchAreas();
+        if (!isOnline){
+            fetchAreasFromDB(cityID);
+        }else {
+            fetchAreas();
+        }
         if (event.getAction() != MotionEvent.ACTION_UP) {
             return false;
         }

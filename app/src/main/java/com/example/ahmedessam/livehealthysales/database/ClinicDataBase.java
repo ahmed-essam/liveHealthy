@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Table(database = AppDataBase.class)
 public class ClinicDataBase extends BaseModel {
-    @PrimaryKey
+    @PrimaryKey(autoincrement = true)
     private int id ;
     @Column
     private Integer clinicID;
@@ -178,7 +178,7 @@ public class ClinicDataBase extends BaseModel {
         this.requestsPerDay = requestsPerDay;
     }
 
-    public Boolean getEditable() {
+    public Boolean isEditable() {
         return editable;
     }
 
@@ -193,4 +193,7 @@ public class ClinicDataBase extends BaseModel {
     public void setDiscount(Integer discount) {
         this.discount = discount;
     }
+
+
+
 }

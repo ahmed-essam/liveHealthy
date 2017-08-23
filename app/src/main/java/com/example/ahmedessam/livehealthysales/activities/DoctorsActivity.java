@@ -336,7 +336,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
             clinic.setClinicNameAR(clinicDataBase.getClinicNameAR());
             clinic.setDiscount(clinicDataBase.getDiscount());
             clinic.setLandLine(clinicDataBase.getLandLine());
-            clinic.setEditable(clinicDataBase.getEditable());
+            clinic.setEditable(clinicDataBase.isEditable());
             clinic.setMobileNumber(clinicDataBase.getMobileNumber());
             clinic.setPrice(clinicDataBase.getPrice());
             clinic.setRequestsPerDay(clinicDataBase.getRequestsPerDay());
@@ -350,8 +350,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
         List<ClinicDataBase> clinicDataBaseList = new ArrayList<>();
         for (int i = 0; i < createClinicDBList.size(); i++) {
-            List<ClinicDataBase> clinicDataBases = SQLite.select().from(ClinicDataBase.class)
-                    .where(ClinicDataBase_Table.requestId_clinicID.eq(createClinicDBList.get(i).getClinicID())).queryList();
+            List<ClinicDataBase> clinicDataBases = createClinicDBList.get(i).getClinicDataBaseList();
             clinicDataBaseList.addAll(clinicDataBases);
         }
         return clinicDataBaseList;
@@ -407,15 +406,17 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                     if (response.body().isSuccess()) {
                         isSuccess = true;
                         Toast.makeText(DoctorsActivity.this, R.string.doctor_added, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(DoctorsActivity.this, R.string.doctor_updated, Toast.LENGTH_SHORT).show();
-                        List<CreateClinicDB> createClinicDBList = SQLite.select().from(CreateClinicDB.class)
-                                .where(CreateClinicDB_Table.Doctor_ID_id.eq(createDoctorDB.getId())).queryList();
+                        List<CreateClinicDB> createClinicDBList = createDoctorDB.getCreateClinicDBList();
                         if (createClinicDBList != null && createClinicDBList.size() > 0) {
                             List<ClinicDataBase> clinicDataBases = getClinicsFromDb(createDoctorDB.getId(), createClinicDBList);
                             List<Clinic> clinics = getClinicsFromClinicsDB(clinicDataBases);
                             if (clinics != null && clinics.size() > 0) {
                                 UpdateDoctorClinicsRequestBody updateDoctorClinicsRequestBody = createClinicRequest(clinics, response.body().getDoctorIdResponse().getDoctorID());
                                 updateClinic(updateDoctorClinicsRequestBody, clinicDataBases, createClinicDBList, createDoctorDB);
+                            }else {
+                                if(createDoctorDB.delete()){
+                                    unSaveCount.setText(""+getRequestsNum());
+                                }
                             }
                         }else {
                         if(createDoctorDB.delete()){

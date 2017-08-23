@@ -34,7 +34,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="5dp"
                 android:orientation="horizontal"
                 >
@@ -42,8 +42,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center|bottom"
-                    android:layout_weight="8"
+                    android:layout_gravity="center|center_vertical"
+                    android:layout_weight="5"
                     android:gravity="center|bottom"
                     android:text="@string/doctors"
                     android:textColor="@color/colorAccent"
@@ -54,7 +54,7 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
+                    android:layout_gravity="center_vertical|end"
                     android:layout_weight="1">
 
                     <ImageButton
@@ -90,9 +90,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:fitsSystemWindows="true"
-                android:layout_marginLeft="@dimen/serch_margin"
-                android:layout_marginRight="@dimen/serch_margin"
+                android:layout_marginLeft="@dimen/side_search_msrgin"
+                android:layout_marginRight="@dimen/side_search_msrgin"
                 android:layout_marginBottom="@dimen/serch_margin"
                 android:layout_marginTop="20dp"
                 android:padding="@dimen/padding"
@@ -103,7 +102,6 @@
                 android:hint="@string/search_by_name"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
-                app:backgroundTint="@color/colorAccent"
                 android:imeOptions="actionSearch"
                 android:imeActionLabel="Search"
                 android:maxLines="1"

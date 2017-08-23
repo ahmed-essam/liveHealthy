@@ -3,6 +3,7 @@ package com.example.ahmedessam.livehealthysales.model_dto.response.response_clas
 import com.example.ahmedessam.livehealthysales.database.AppDataBase;
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.Areas.Area;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -20,7 +21,7 @@ public class City extends BaseModel{
     private String Name;
     @Column
     private String Name_AR;
-    @Column
+    @PrimaryKey
     private int ID;
 
     public static void clearCitiesDB(){

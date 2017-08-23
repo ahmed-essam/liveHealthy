@@ -103,8 +103,6 @@ public class AddDoctorActivity extends BaseLocationActivity {
     EditText emailEditText;
     @BindView(R.id.social_media)
     EditText socialMedia;
-    @BindView(R.id.button_add_clinic)
-    EditText addClinic;
     @BindView(R.id.progress_bar)
     ProgressBar progress;
     @BindView(R.id.nested_scroll)
@@ -141,6 +139,7 @@ public class AddDoctorActivity extends BaseLocationActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_doctor);
         ButterKnife.bind(this);
+        conultant = 2;
         if (Connectivity.isConnected(this)){
             internetConnection = true;
         }else{
@@ -279,7 +278,7 @@ public class AddDoctorActivity extends BaseLocationActivity {
             if (! Connectivity.isConnected(this)){
                 saveCreateInDB(createDoctorRequest());
                 progress.setVisibility(View.GONE);
-                Toast.makeText(this, R.string.network_error + getString(R.string.request_saved), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.request_saved), Toast.LENGTH_SHORT).show();
                 initiateDialog();
                 return;
             }else {
@@ -310,6 +309,7 @@ public class AddDoctorActivity extends BaseLocationActivity {
                         finish();
                     }
                 }).create();
+        dialog.show();
     }
 
 
@@ -334,6 +334,12 @@ public class AddDoctorActivity extends BaseLocationActivity {
             consultantEditText.setError(getString(R.string.empty_feild));
             valid = false;
         } else {
+            consultantEditText.setError(null);
+        }
+        if (conultant==0){
+            consultantEditText.setError(getString(R.string.empty_feild));
+            valid = false;
+        }else{
             consultantEditText.setError(null);
         }
         if (isEmpty(nursery.getText())) {

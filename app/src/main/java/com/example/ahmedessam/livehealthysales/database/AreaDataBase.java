@@ -4,6 +4,7 @@ import com.example.ahmedessam.livehealthysales.model_dto.response.response_class
 import com.example.ahmedessam.livehealthysales.model_dto.response.response_class.cities.City;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -21,7 +22,7 @@ public class AreaDataBase extends BaseModel {
     private String Name;
     @Column
     private String Name_AR;
-    @Column
+    @PrimaryKey
     private int ID;
     @ForeignKey(tableClass = City.class)
     private int CityId;
