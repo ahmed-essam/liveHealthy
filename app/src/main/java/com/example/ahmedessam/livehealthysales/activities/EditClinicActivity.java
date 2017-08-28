@@ -181,7 +181,7 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
         else
             setTitle(clinic.getClinicNameAR());
 
-        adapter = new ScheduleAdapter(new ArrayList<Day>(), this);
+        adapter = new ScheduleAdapter(new ArrayList<Day>(), this,this);
         adapter.setHideDelete(false);
 
         scheduleRecycler.setAdapter(adapter);
@@ -278,7 +278,9 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
         createClinicDB.setLang(Locale.getDefault().getDisplayLanguage());
         createClinicDB.setDoctor_ID(doctorID);
         createClinicDB.save();
-        int clinicId= SQLite.select(CreateClinicDB_Table.clinicID).from(CreateClinicDB.class).where(CreateClinicDB_Table.doctor_id.eq(doctorID)).hashCode();
+        CreateClinicDB createclinic= SQLite.select(CreateClinicDB_Table.clinicID).from(CreateClinicDB.class)
+                .where(CreateClinicDB_Table.doctor_id.eq(doctorID)).querySingle();
+        int clinicId = createclinic.getClinicID();
         for (int i = 0;i<clinics.size();i++) {
             Clinic clinic = clinics.get(i);
             ClinicDataBase clinicDataBase = new ClinicDataBase();
@@ -296,8 +298,8 @@ public class EditClinicActivity extends AppCompatActivity implements AddSchedule
             clinicDataBase.setClinicNameAR(clinic.getClinicNameAR());
             clinicDataBase.setDiscount(clinic.getDiscount());
             clinicDataBase.setAreaID(clinic.getAreaID());
+            clinicDataBase.setEditable(true);
             clinicDataBase.setAreaName(clinic.getAreaName());
-            clinicDataBase.setEditable(clinic.getEditable());
             clinicDataBase.setLandLine(clinic.getLandLine());
             clinicDataBase.setRequestId(clinicId);
             clinicDataBase.save();

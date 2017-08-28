@@ -8,7 +8,5 @@
     android:padding="8dp"
     android:visibility="gone"
     tools:showIn="@layout/activity_login"
-    android:progressBackgroundTint="@color/colorPrimary"
-    android:backgroundTint="@color/colorPrimary"
     tools:visibility="visible"
      />

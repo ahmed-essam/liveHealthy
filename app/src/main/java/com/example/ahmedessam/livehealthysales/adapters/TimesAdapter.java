@@ -32,11 +32,20 @@ public class TimesAdapter extends RecyclerView.Adapter<TimesAdapter.ViewHolder> 
 
     List<Day> dayList;
     private Context context;
+    private String[] dayesArray;
+
 
 
     public TimesAdapter(Context context) {
         this.context = context;
         dayList = new ArrayList<>();
+       dayesArray= new String[]{context.getResources().getString(R.string.monday),
+                context.getResources().getString(R.string.tuesday),
+                context.getResources().getString(R.string.wednesday),
+                context.getResources().getString(R.string.thursday),
+                context.getResources().getString(R.string.friday),
+                context.getResources().getString(R.string.saturday)};
+
     }
 
     public Context getContext() {
@@ -86,8 +95,14 @@ public class TimesAdapter extends RecyclerView.Adapter<TimesAdapter.ViewHolder> 
         }
 
         public void bindView(Day day) {
-            dayText.setText(day.getDay());
-           appointments.setText(
+
+            if (day.getDay()==null){
+                int dayaID= day.getDayId()+1;
+                dayText.setText(dayesArray[dayaID]);
+            }else {
+                dayText.setText(day.getDay());
+            }
+            appointments.setText(
                     String.format("%s %s %s %s",
                             itemView.getContext().getString(R.string.from), formatTime(day.getFromHour()),
                             itemView.getContext().getString(R.string.to), formatTime(day.getToHour()))

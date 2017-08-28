@@ -101,8 +101,12 @@ public class EditDoctorActivity extends AppCompatActivity {
         }
         if (Connectivity.isConnected(this)){
             internetConnection = true;
+            editClinicButton.setVisibility(View.VISIBLE);
+            editClinicButton.setEnabled(true);
         }else{
             internetConnection = false;
+            editClinicButton.setVisibility(View.GONE);
+            editClinicButton.setEnabled(false);
         }
         specialites = new ArrayList<>();
         setSupportActionBar(toolbar);

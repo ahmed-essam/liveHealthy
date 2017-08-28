@@ -164,9 +164,6 @@ public class Clinic implements Parcelable {
         this.requestsPerDay = requestsPerDay;
     }
 
-    public Boolean getEditable() {
-        return editable;
-    }
 
     public void setEditable(Boolean editable) {
         this.editable = editable;

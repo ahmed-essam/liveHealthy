@@ -29,7 +29,7 @@
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/detail_toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
                     android:layout_gravity="top|center"
                     android:gravity="center"
                     app:layout_collapseMode="pin">
@@ -43,61 +43,72 @@
                         android:textSize="20sp" />
 
                 </android.support.v7.widget.Toolbar>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="6dp">
+
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/detail_doctor_image"
                     android:layout_width="@dimen/image_dimens"
                     android:layout_height="@dimen/image_dimens"
                     android:layout_gravity="start|center_vertical"
-                    android:layout_marginBottom="20dp"
                     android:layout_marginLeft="@dimen/serch_margin"
                     android:layout_marginStart="@dimen/serch_margin"
-                    android:layout_marginTop="8dp"
                     android:src="@drawable/background"
 
                     />
-
                 <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginEnd="@dimen/padding"
+                    android:layout_marginRight="@dimen/padding"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/detail_doctor_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/detail_doctor_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:drawableLeft="@drawable/detail_mail"
+                        android:drawablePadding="@dimen/margin_small"
+                        android:drawableStart="@drawable/detail_mail"
+                        android:maxLines="1"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:layout_marginBottom="@dimen/fab_margin"
+                    android:layout_marginBottom="35dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginStart="10dp"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="2dp"
                     android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_gravity="bottom"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/detail_doctor_name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxLines="1"
-                            android:textColor="@color/colorAccent"
-                            android:textSize="20sp" />
-
-                        <TextView
-                            android:id="@+id/detail_doctor_email"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:drawableLeft="@drawable/detail_mail"
-                            android:drawablePadding="@dimen/margin_small"
-                            android:drawableStart="@drawable/detail_mail"
-                            android:maxLines="1"
-                            android:textColor="@color/colorAccent"
-                            android:textSize="12sp" />
-                    </LinearLayout>
 
                     <Button
                         android:id="@+id/edit_button"
@@ -131,7 +142,7 @@
                         android:textColor="@color/colorAccent"
                         android:textSize="16sp" />
 
-                </LinearLayout>
+                </RelativeLayout>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
@@ -142,7 +153,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        app:behavior_overlapTop="25dp"
+        app:behavior_overlapTop="@dimen/overlay"
         app:layout_anchor="@id/appbar_layout"
         app:layout_anchorGravity="center|bottom"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">

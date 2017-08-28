@@ -21,7 +21,7 @@ import java.util.List;
 public class CreateClinicDB extends BaseModel {
     @Column
     @ForeignKey(tableClass = CreateDoctorDB.class,references = @ForeignKeyReference(columnName = "doctor_id", foreignKeyColumnName = "id"))
-    private static long Doctor_ID;
+    private  long Doctor_ID;
     @Column
     private String lang;
 
@@ -46,11 +46,11 @@ public class CreateClinicDB extends BaseModel {
         FlowManager.getModelAdapter(CreateClinicDB.class).deleteAll(movieList);
     }
 
-    public static long getDoctor_ID() {
+    public  long getDoctor_ID() {
         return Doctor_ID;
     }
 
-    public static void setDoctor_ID(long doctor_ID) {
+    public  void setDoctor_ID(long doctor_ID) {
         Doctor_ID = doctor_ID;
     }
 

@@ -25,10 +25,13 @@
         <activity android:name=".activities.HomeActivity" />
         <activity android:name=".activities.DoctorsActivity" />
         <activity android:name=".activities.DoctorDetailActivity" />
-        <activity android:name=".activities.AddDoctorActivity" />
+        <activity android:name=".activities.AddDoctorActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.ClinicsActivity" />
-        <activity android:name=".activities.EditClinicActivity" />
-        <activity android:name=".activities.EditDoctorActivity"></activity>
+        <activity android:name=".activities.EditClinicActivity"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".activities.EditDoctorActivity"
+            android:windowSoftInputMode="adjustResize"></activity>
     </application>
 
 </manifest>

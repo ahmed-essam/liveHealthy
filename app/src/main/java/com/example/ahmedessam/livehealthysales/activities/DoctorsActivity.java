@@ -17,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,6 +74,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     @BindView(R.id.un_saved_num)
     TextView unSaveCount;
 
+
     //variables
     boolean isSuccess;
     DoctorsAdapter doctorsAdapter;
@@ -83,6 +85,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     Animation rotateAboutCenterAnimation;
     private EndlessRecyclerViewScrollListener scrollListener;
     private int pageNum;
+    private String searchKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +93,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
         setContentView(R.layout.activity_doctors);
         ButterKnife.bind(this);
         noDataText.setVisibility(View.GONE);
+        searchKey = "";
         isSuccess = false;
         pageNum = 1;
         int requestNum = getRequestsNum();
@@ -126,11 +130,9 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayout) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-
+                mSwipeRefreshLayout.setRefreshing(true);
                 pageNum = pageNum + 1;
-
-                fetchDoctors(searchEditText.getText().toString());
-
+                fetchDoctors(searchKey);
             }
         };
 
@@ -147,8 +149,9 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 pageNum = 1;
-                mSwipeRefreshLayout.setRefreshing(true);
+                searchKey = charSequence.toString();
                 fetchDoctors(charSequence.toString());
+                mSwipeRefreshLayout.setRefreshing(true);
             }
 
             @Override
@@ -178,6 +181,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
         if (updateDoctorDbs != null) {
             sum = sum + updateDoctorDbs.size();
         }
+        Log.d(TAG, "getRequestsNum: "+sum);
         return sum;
     }
 
@@ -212,20 +216,19 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 //                        }
                     }
                 }
-                rotateAboutCenterAnimation.reset();
-                rotateAboutCenterAnimation.cancel();
+
 
                 if (getRequestsNum() > 0) {
                     unSaveCount.setVisibility(View.VISIBLE);
                     unSaveCount.setText("" + getRequestsNum());
                 } else {
                     unSaveCount.setVisibility(View.GONE);
-                    rotateAboutCenterAnimation.reset();
-                    rotateAboutCenterAnimation.cancel();
                 }
             } else {
                 unSaveCount.setVisibility(View.GONE);
                 Toast.makeText(this, R.string.no_data, Toast.LENGTH_SHORT).show();
+                rotateAboutCenterAnimation.reset();
+                rotateAboutCenterAnimation.cancel();
             }
         } else {
             Toast.makeText(this, R.string.network_error, Toast.LENGTH_SHORT).show();
@@ -233,6 +236,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     }
 
     public void fetchDoctors(String name) {
+        noDataText.setVisibility(View.GONE);
         DoctorsRequest doctorsRequest = getRequest(name);
         responceCall = NetworkProvider.provideNetworkMethods(this).getDoctors(doctorsRequest);
         responceCall.enqueue(new Callback<AllDoctorsResponse>() {
@@ -245,8 +249,9 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                         if (response.body().isSuccess()) {
                             if (response.body().getDoctorsResponse().getDoctors() != null) {
                                 List<Doctor> doctorList = response.body().getDoctorsResponse().getDoctors();
+//                                progressBar.setVisibility(View.GONE);
+
                                 if (doctorList.size() > 0) {
-                                    noDataText.setVisibility(View.GONE);
                                     if (pageNum == 1) {
                                         doctorsAdapter.addAll(doctorList);
                                     } else {
@@ -259,18 +264,25 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                             } else {
                                 noDataText.setText(R.string.no_data);
                                 noDataText.setVisibility(View.VISIBLE);
+//                                progressBar.setVisibility(View.GONE);
+
                             }
                         } else {
                             noDataText.setText(response.body().getErrorMessage());
                             noDataText.setVisibility(View.VISIBLE);
+//                            progressBar.setVisibility(View.GONE);
+
                         }
                     } else {
 
                         noDataText.setText(R.string.no_data);
                         noDataText.setVisibility(View.VISIBLE);
+//                        progressBar.setVisibility(View.GONE);
+
                     }
                 } else {
                     Toast.makeText(DoctorsActivity.this, "" + response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
+//                    progressBar.setVisibility(View.GONE);
                 }
 
             }
@@ -280,6 +292,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                 noDataText.setText(R.string.network_error);
                 noDataText.setVisibility(View.VISIBLE);
                 mSwipeRefreshLayout.setRefreshing(false);
+//                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -365,6 +378,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     }
 
     public void updateDoctor(UpdateDoctorRequest updateDoctorRequest, final UpdateDoctorDb updateDoctorDb) {
+        refreshIcon.startAnimation(rotateAboutCenterAnimation);
         updateDoctorResponseCall = NetworkProvider.provideNetworkMethods(this).updateDoctor(updateDoctorRequest);
         updateDoctorResponseCall.enqueue(new Callback<UpdateDoctorResponse>() {
             @Override
@@ -372,32 +386,35 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                 if (response.isSuccessful()) {
                     if (response.body().isSuccess()) {
                         isSuccess = true;
-
+                        rotateAboutCenterAnimation.reset();
                         if (updateDoctorDb.delete()) {
                             unSaveCount.setText("" + getRequestsNum());
                         }
                     } else {
                         isSuccess = false;
                         Toast.makeText(DoctorsActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
-
                     }
                 } else {
                     isSuccess = false;
                     Toast.makeText(DoctorsActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
-
                 }
+                rotateAboutCenterAnimation.reset();
+                rotateAboutCenterAnimation.cancel();
             }
 
             @Override
             public void onFailure(Call<UpdateDoctorResponse> call, Throwable t) {
                 isSuccess = false;
                 Toast.makeText(DoctorsActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                rotateAboutCenterAnimation.reset();
+                rotateAboutCenterAnimation.cancel();
             }
         });
 
     }
 
     public void createDoctor(CreateDoctorRequest createDoctorRequest, final CreateDoctorDB createDoctorDB) {
+        refreshIcon.startAnimation(rotateAboutCenterAnimation);
         createDoctorResponse = NetworkProvider.provideNetworkMethods(this).createNewDoctor(createDoctorRequest);
         createDoctorResponse.enqueue(new Callback<CreateDoctorResponse>() {
             @Override
@@ -406,6 +423,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                     if (response.body().isSuccess()) {
                         isSuccess = true;
                         Toast.makeText(DoctorsActivity.this, R.string.doctor_added, Toast.LENGTH_SHORT).show();
+                        rotateAboutCenterAnimation.reset();
                         List<CreateClinicDB> createClinicDBList = createDoctorDB.getCreateClinicDBList();
                         if (createClinicDBList != null && createClinicDBList.size() > 0) {
                             List<ClinicDataBase> clinicDataBases = getClinicsFromDb(createDoctorDB.getId(), createClinicDBList);
@@ -424,15 +442,19 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                         }
                         }
                     } else {
+
                         isSuccess = false;
                         Toast.makeText(DoctorsActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
 
                     }
 
                 } else {
+
                     isSuccess = false;
                     Toast.makeText(DoctorsActivity.this, response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
                 }
+                rotateAboutCenterAnimation.reset();
+                rotateAboutCenterAnimation.cancel();
             }
 
 
@@ -441,6 +463,10 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                 Log.e(TAG, "onFailure: " + t.getMessage());
                 isSuccess = false;
                 Toast.makeText(DoctorsActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                rotateAboutCenterAnimation.reset();
+                rotateAboutCenterAnimation.cancel();
+
+
             }
         });
 
@@ -466,7 +492,10 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
         }
     }
 
-    public void updateClinic(final UpdateDoctorClinicsRequestBody updateClinicsRequest, final List<ClinicDataBase> clincs, final List<CreateClinicDB> createClinicDBList, final CreateDoctorDB createDoctorDB) {
+    public void updateClinic(final UpdateDoctorClinicsRequestBody updateClinicsRequest,
+                             final List<ClinicDataBase> clincs, final List<CreateClinicDB> createClinicDBList,
+                             final CreateDoctorDB createDoctorDB) {
+        refreshIcon.startAnimation(rotateAboutCenterAnimation);
         updateClinicResponseCall = NetworkProvider.provideNetworkMethods(this).updateClinic(updateClinicsRequest);
         updateClinicResponseCall.enqueue(new Callback<UpdateDoctorResponse>() {
             @Override
@@ -475,6 +504,8 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
                     List<ClinicDataBase> clinicDataBaseList = clincs;
                     for (int i = 0; i < clinicDataBaseList.size(); i++) {
                         ClinicDataBase clinicDataBase = clinicDataBaseList.get(i);
+                        rotateAboutCenterAnimation.reset();
+                        rotateAboutCenterAnimation.cancel();
                         if (clinicDataBase.delete()) {
                             Log.d(TAG, "onResponse: " + "ok" + i);
                         }
@@ -491,12 +522,17 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
                 } else {
                     Log.e(TAG, "onResponse: " + response.body().getErrorMessage());
+                    rotateAboutCenterAnimation.reset();
+                    rotateAboutCenterAnimation.cancel();
+
                 }
 
             }
 
             @Override
             public void onFailure(Call<UpdateDoctorResponse> call, Throwable t) {
+                rotateAboutCenterAnimation.reset();
+                rotateAboutCenterAnimation.cancel();
 
             }
         });
@@ -519,7 +555,11 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
     @Override
     public void onRefresh() {
         pageNum = 1;
-        fetchDoctors("");
+        if (!"".equals(searchKey)|| searchKey!= null){
+            fetchDoctors(searchKey);
+        }else {
+            fetchDoctors("");
+        }
     }
 
     @Override

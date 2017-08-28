@@ -15,10 +15,15 @@
         android:gravity="center"
         android:id="@+id/add_doctor_toolbar"
         android:elevation="4dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="4"
                 android:gravity="center"
                 android:text="@string/add_doctor"
                 android:textSize="20sp"
@@ -27,15 +32,18 @@
                 />
 
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
             android:layout_marginRight="8dp"
             android:src="@drawable/checked"
             android:id="@+id/save_icon"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:background="@android:color/transparent"
             />
+        </LinearLayout>
 
 
     </android.support.v7.widget.Toolbar>
@@ -207,7 +215,6 @@
             android:drawableRight="@drawable/down_arrow_copy"
             android:elevation="4dp"
             android:hint="@string/consultant"
-            android:inputType="textEmailAddress"
             android:minHeight="40dp"
             android:padding="4dp"
             android:nextFocusForward="@+id/nursing"
@@ -229,7 +236,6 @@
                 android:drawableRight="@drawable/down_arrow_copy"
                 android:elevation="4dp"
                 android:hint="@string/nursery"
-                android:inputType="textEmailAddress"
                 android:minHeight="40dp"
                 android:padding="4dp"
                 android:maxLines="1"

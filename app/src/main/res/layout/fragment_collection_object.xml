@@ -20,7 +20,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/no_schedule"
         android:text="@string/no_schedule"
-        android:layout_marginTop="6dp"
-        android:visibility="gone"/>
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        android:visibility="gone"
+        />
 
 </LinearLayout>

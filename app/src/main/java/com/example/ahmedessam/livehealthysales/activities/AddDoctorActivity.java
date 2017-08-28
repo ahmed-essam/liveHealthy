@@ -342,24 +342,7 @@ public class AddDoctorActivity extends BaseLocationActivity {
         }else{
             consultantEditText.setError(null);
         }
-        if (isEmpty(nursery.getText())) {
-            nursery.setError(getString(R.string.empty_feild));
-            valid = false;
-        } else {
-            nursery.setError(null);
-        }
-        if (isEmpty(tittle.getText())) {
-            tittle.setError(getString(R.string.empty_feild));
-            valid = false;
-        } else {
-            tittle.setError(null);
-        }
-        if (isEmpty(tittleAR.getText())) {
-            tittleAR.setError(getString(R.string.empty_feild));
-            valid = false;
-        } else {
-            tittleAR.setError(null);
-        }
+
         if (isEmpty(doctorNameEditText.getText())) {
             doctorNameEditText.setError(getString(R.string.empty_feild));
             valid = false;
@@ -408,12 +391,6 @@ public class AddDoctorActivity extends BaseLocationActivity {
             valid = false;
         } else {
             addressEditText.setError(null);
-        }
-        if (isEmpty(socialMedia.getText())) {
-            socialMedia.setError(getString(R.string.empty_feild));
-            valid = false;
-        } else {
-            socialMedia.setError(null);
         }
         if (isEmpty(location.getText())) {
             location.setError(getString(R.string.empty_feild));

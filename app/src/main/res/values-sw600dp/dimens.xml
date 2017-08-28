@@ -8,5 +8,7 @@
     <dimen name="doctor_detail_header">320dp</dimen>
     <dimen name="image_dimens">100dp</dimen>
     <dimen name="margin_small">8dp</dimen>
+    <dimen name="side_search_msrgin">60dp</dimen>
+    <dimen name="overlay">30dp</dimen>
 
 </resources>

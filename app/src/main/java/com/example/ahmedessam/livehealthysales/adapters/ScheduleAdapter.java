@@ -1,5 +1,6 @@
 package com.example.ahmedessam.livehealthysales.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +26,18 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     private List<Day> days;
     private boolean hideDelete;
     private onItemRemovedListener listener;
+    private String[] dayesArray;
 
-    public ScheduleAdapter(List<Day> days, onItemRemovedListener listener) {
+    public ScheduleAdapter(List<Day> days, onItemRemovedListener listener, Context context) {
         this.days = days;
         this.listener = listener;
+        dayesArray= new String[]{context.getResources().getString(R.string.sunday),
+                context.getResources().getString(R.string.monday),
+                context.getResources().getString(R.string.tuesday),
+                context.getResources().getString(R.string.wednesday),
+                context.getResources().getString(R.string.thursday),
+                context.getResources().getString(R.string.friday),
+                context.getResources().getString(R.string.saturday)};
     }
 
     public void setHideDelete(boolean hideDelete) {
@@ -88,7 +97,12 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
 
         void bind(int position) {
             Day item = days.get(position);
-            day.setText(item.getDay());
+            if (item.getDay()==null){
+                int dayaID= item.getDayId()+1;
+                day.setText(dayesArray[dayaID]);
+            }else {
+                day.setText(item.getDay());
+            }
             details.setText(
                     String.format("%s %s %s %s",
                             itemView.getContext().getString(R.string.from), formatTime(item.getFromHour()),

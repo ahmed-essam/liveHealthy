@@ -36,6 +36,7 @@ public class ClinicsAdapter extends RecyclerView.Adapter<ClinicsAdapter.BaseClin
 
     public ClinicsAdapter(ArrayList<Clinic> clinics, boolean showNamesOnly,int doctorId , boolean online) {
         this.clinics = clinics;
+        this.online = online;
         if (Locale.getDefault().getDisplayLanguage()=="English"){
             isEnglish = true;
         }else{
@@ -101,6 +102,12 @@ public class ClinicsAdapter extends RecyclerView.Adapter<ClinicsAdapter.BaseClin
             else
                 clinicName.setText(item.getClinicNameAR());
             editButton.setVisibility(item.isEditable() ? View.VISIBLE : View.GONE);
+            if (!online){
+                editButton.setVisibility(View.GONE);
+            }else{
+                editButton.setVisibility(View.VISIBLE);
+            }
+
         }
 
         @OnClick(R.id.editButton)
