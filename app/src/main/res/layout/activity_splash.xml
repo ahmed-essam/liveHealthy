@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/background"
-    tools:context="com.example.ahmedessam.livehealthysales.activities.SplashActivity">
+    tools:context="com.yackeen.livehealthy.sales.activities.SplashActivity">
     <ImageView
         android:id="@+id/logo"
         android:layout_width="143dp"

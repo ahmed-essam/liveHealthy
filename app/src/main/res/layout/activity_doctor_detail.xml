@@ -275,12 +275,12 @@
                     android:layout_height="wrap_content"
                     android:background="#DEE1E0" />
 
-                <com.example.ahmedessam.livehealthysales.widget.WrapContentViewPager
+                <com.yackeen.livehealthy.sales.widget.WrapContentViewPager
                     android:id="@+id/pager"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                </com.example.ahmedessam.livehealthysales.widget.WrapContentViewPager>
+                </com.yackeen.livehealthy.sales.widget.WrapContentViewPager>
             </LinearLayout>
 
         </LinearLayout>
