@@ -49,7 +49,6 @@ public class DoctorsAdapter extends RecyclerView.Adapter<DoctorsAdapter.ViewHold
                     .into(doctorImage);
             doctorName.setText(doctor.getName());
             doctorSpeciality.setText(doctor.getSpeciality());
-
         }
 
         @Override

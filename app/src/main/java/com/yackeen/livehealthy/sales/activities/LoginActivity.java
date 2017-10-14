@@ -3,8 +3,8 @@ package com.yackeen.livehealthy.sales.activities;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -40,35 +40,40 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.login_progress_bar)
     ProgressBar progressBar;
     private String TAG = LoginActivity.class.getSimpleName();
-    private String language;
-
+    private String language, lang;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
-        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+        Log.d(TAG, Locale.getDefault().getLanguage());
+        if ("ar".equals(Locale.getDefault().getLanguage())){
+            lang = getString(R.string.eng_language);
+        }else{
+            lang =getString(R.string.other_lang);
+        }
         language = UserHelper.getAppLang(this);
         if (language != null) {
             String languageToLoad = null;
             if (language.equals("ar")) {
-                langButton.setText(R.string.eng_language);
+                lang=getString(R.string.eng_language);
                 languageToLoad = "ar";
             } else {
-                langButton.setText(R.string.other_lang);
+                lang=getString(R.string.other_lang);
                 languageToLoad = "en";
             }
 //            UserHelper.saveStringInSharedPreferences(UserHelper.AppLang,languageToLoad,this);
             Locale locale = new Locale(languageToLoad);
-            Locale.setDefault(locale);
             Configuration config = new Configuration();
             config.locale = locale;
             getBaseContext().getResources().updateConfiguration(config,
                     getBaseContext().getResources().getDisplayMetrics());
 
         }
+        setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
+        langButton.setText(lang);
+        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
 
     }
 
@@ -86,7 +91,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        UserHelper.saveStringInSharedPreferences(UserHelper.AppLang,languageToLoad,this);
+        UserHelper.saveStringInSharedPreferences(UserHelper.AppLang, languageToLoad, this);
 //        Locale locale = new Locale(languageToLoad);
 //        Locale.setDefault(locale);
 //        Configuration config = new Configuration();
@@ -122,18 +127,18 @@ public class LoginActivity extends AppCompatActivity {
                             if (loginResponce.getIsSuccess()) {
                                 String s = loginResponce.Response.getUserDetail().getUser_ID();
                                 Log.d(TAG, "onResponse: " + s);
-                                UserHelper.saveStringInSharedPreferences(UserHelper.UserId,s,LoginActivity.this);
-                                UserHelper.saveStringInSharedPreferences(UserHelper.UserType,loginResponce.Response.getUserDetail().getType(),LoginActivity.this);
-                                UserHelper.saveStringInSharedPreferences(UserHelper.security_token,response.headers().get("Token "),LoginActivity.this);
-                                Log.d("token", ":"+response.headers().get("Token "));
-                                startActivity(new Intent(LoginActivity.this,HomeActivity.class));
+                                UserHelper.saveStringInSharedPreferences(UserHelper.UserId, s, LoginActivity.this);
+                                UserHelper.saveStringInSharedPreferences(UserHelper.UserType, loginResponce.Response.getUserDetail().getType(), LoginActivity.this);
+                                UserHelper.saveStringInSharedPreferences(UserHelper.security_token, response.headers().get("Token "), LoginActivity.this);
+                                Log.d("token", ":" + response.headers().get("Token "));
+                                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                                 finish();
-                            }else {
-                                Toast.makeText(LoginActivity.this, ""+loginResponce.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "" + loginResponce.getErrorMessage(), Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Log.d(TAG, "onResponse: empty response");
-                            Toast.makeText(LoginActivity.this, ""+response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "" + response.body().getErrorMessage(), Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Log.d(TAG, "onResponse: fail");
@@ -161,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public boolean verifyData() {
-        if (!TextHelper.isEditTextEmpty(new EditText[]{emailEditText, passwordEditText},this)) {
+        if (!TextHelper.isEditTextEmpty(new EditText[]{emailEditText, passwordEditText}, this)) {
             return true;
         } else
             return false;

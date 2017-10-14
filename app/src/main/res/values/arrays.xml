@@ -2,7 +2,7 @@
 <resources>
 
     <string-array name="speciality_array">
-        <item>المستوي</item>
-        <item>عدد المشتركين</item>
+        <item>level</item>
+        <item>num of subscribers</item>
     </string-array>
 </resources>

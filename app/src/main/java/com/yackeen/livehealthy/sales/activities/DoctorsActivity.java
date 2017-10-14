@@ -266,7 +266,7 @@ public class DoctorsActivity extends AppCompatActivity implements SwipeRefreshLa
 
                             }
                         } else {
-                            noDataText.setText(response.body().getErrorMessage());
+                            noDataText.setText(R.string.network_error);
                             noDataText.setVisibility(View.VISIBLE);
 //                            progressBar.setVisibility(View.GONE);
 

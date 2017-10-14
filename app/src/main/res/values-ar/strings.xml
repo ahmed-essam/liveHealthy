@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-        <string name="app_name">LH SALES</string>
+        <string name="app_name">LH Sales</string>
         <string name="other_lang">ع</string>
         <string name="eng_language">ENG</string>
         <string name="email">البريد الالكتروني</string>
@@ -82,4 +82,6 @@
         <string name="clinic_updated">تم تعديل العياده</string>
         <string name="edit_doctor">تعديل</string>
         <string name="clinics">عيادات</string>
+        <string name="save_and_add_clinic">حفظ واضافه عياده</string>
+        <string name="save_only">حفظ فقط</string>
 </resources>
